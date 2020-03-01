@@ -46,6 +46,9 @@ public class MainActivity extends AppCompatActivity {
 
     TextView fecha;
     TextView hora;
+    TextView recovoz;
+    private static final int RECOGNIZE_SPEECH_ACTIVITY = 1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
         fecha = (TextView) findViewById(R.id.fecha);
         hora = (TextView) findViewById(R.id.hora);
+        recovoz= (TextView) findViewById(R.id.timer);
 
         EMERGENCIA.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
                 Date date = new Date();
                 String fechafinal = dateFormat.format(date);
                 fecha.setText(fechafinal);
-                WEBSERVICE("http://direccion de correo");
+               // WEBSERVICE("https://localhost:44370/WebService1.asmx");/////////////////////////////////////////////////////////PONER UN URL NO USAR POR EL MOMENTO
             }
         });
 
@@ -78,9 +82,70 @@ public class MainActivity extends AppCompatActivity {
                 Date date = new Date();
                 String horafinal = dateFormat.format(date);
                 hora.setText(horafinal);
+                reconocer();
             }
         });
+
+
+
     }
+    private void reconocer(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Intent intentActionRecognizeSpeech = new Intent(
+                        RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                intentActionRecognizeSpeech.putExtra(
+                        RecognizerIntent.EXTRA_LANGUAGE_MODEL, "es-MX");
+                try {
+                    startActivityForResult(intentActionRecognizeSpeech,
+                            RECOGNIZE_SPEECH_ACTIVITY);
+                } catch (ActivityNotFoundException a) {
+                    Toast.makeText(getApplicationContext(),
+                            "Tú dispositivo no soporta el reconocimiento por voz",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        }).start();
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case RECOGNIZE_SPEECH_ACTIVITY:
+                if (resultCode == RESULT_OK && null != data) {
+                    ArrayList<String> speech = data
+                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    String strSpeech2Text = speech.get(0);
+                    recovoz.setText(strSpeech2Text);
+
+
+                }
+            default:
+                break;
+
+        }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     private void WEBSERVICE (String URL){
         StringRequest request= new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
             @Override
@@ -97,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected Map <String, String> getParams() throws AuthFailureError{
                 Map<String, String> parametros= new HashMap<String, String>();
-                parametros.put("codigo",fecha.getText().toString());
+                parametros.put("FECHA",fecha.getText().toString());
                 return parametros;
             }
         };
