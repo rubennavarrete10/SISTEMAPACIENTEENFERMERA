@@ -7,6 +7,7 @@ import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Environment;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
@@ -43,6 +44,7 @@ import com.android.volley.toolbox.Volley;
     TextView fecha;
     TextView hora;
     TextView recovoz;
+     private boolean presionado = false;
 
     String localizacion = "/storage/emulated/0/Pictures/Messenger";
     Uri uri = Uri.parse(localizacion); //esto se usa para reproducir url de internet
@@ -72,25 +74,40 @@ import com.android.volley.toolbox.Volley;
         EMERGENCIA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                Date date = new Date();
-                String fechafinal = dateFormat.format(date);
-                fecha.setText(fechafinal);
                // WEBSERVICE("https://localhost:44370/WebService1.asmx");/////////////////////////////////////////////////////////PONER UN URL NO USAR POR EL MOMENTO
                 //reconocer();
-                play();
+
             }
         });
 
         if (tarjetaSd()== true) {
-            ASISTENCIA.setOnClickListener(new View.OnClickListener() {
+            ASISTENCIA.setOnTouchListener(new View.OnTouchListener() {
                 @Override
-                public void onClick(View v) {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
-                    Date date = new Date();
-                    String horafinal = dateFormat.format(date);
-                    hora.setText(horafinal);
-                    reco();
+                public boolean onTouch(View v, MotionEvent event) {
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            if (!presionado) {
+                                presionado = true;
+                                //AsyncTask que ejecuta Tarea.
+                                SimpleDateFormat horaFormat = new SimpleDateFormat("hh:mm:ss");
+                                Date horaD = new Date();
+                                String horafinal = horaFormat.format(horaD);
+                                hora.setText(horafinal);
+
+                                SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                                Date date = new Date();
+                                String fechafinal = dateFormat.format(date);
+                                fecha.setText(fechafinal);
+                                reco();
+                            }
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            presionado = false;
+                            play();
+                            Toast.makeText(getApplicationContext(), "DEJO DE GRABAR", Toast.LENGTH_LONG).show();
+                            break;
+                    }
+                    return true;
                 }
             });
         }
