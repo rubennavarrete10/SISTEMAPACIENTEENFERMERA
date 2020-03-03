@@ -6,12 +6,13 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+
     <TextView
         android:id="@+id/textView2"
         android:layout_width="345dp"
         android:layout_height="51dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="16dp"
         android:contentDescription="@string/app_name"
         android:text="SISTEMA PACIENTE ENFERMERA"
         android:textSize="18sp"
@@ -20,49 +21,49 @@
 
     <Button
         android:id="@+id/ASISTENCIA"
-        android:layout_width="355dp"
-        android:layout_height="52dp"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="108dp"
+        android:layout_width="319dp"
+        android:layout_height="59dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="84dp"
         android:text="ASISTENCIA"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/EMERGENCIA"
-        android:layout_width="363dp"
-        android:layout_height="51dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="172dp"
+        android:layout_width="319dp"
+        android:layout_height="58dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="160dp"
         android:text="EMERGENCIA"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/ASISTENCIAHECHA"
-        android:layout_width="150dp"
-        android:layout_height="138dp"
-        android:layout_marginStart="244dp"
-        android:layout_marginTop="288dp"
+        android:layout_width="231dp"
+        android:layout_height="82dp"
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="360dp"
         android:text="ASISTENCIA HECHA"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/fecha"
-        android:layout_width="192dp"
-        android:layout_height="203dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="304dp"
+        android:layout_width="388dp"
+        android:layout_height="117dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="228dp"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/hora"
-        android:layout_width="375dp"
-        android:layout_height="127dp"
+        android:layout_width="393dp"
+        android:layout_height="104dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="608dp"
+        android:layout_marginTop="544dp"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -71,7 +72,7 @@
         android:layout_width="392dp"
         android:layout_height="70dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="528dp"
+        android:layout_marginTop="464dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
