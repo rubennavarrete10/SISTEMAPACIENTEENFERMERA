@@ -54,8 +54,7 @@ import com.android.volley.toolbox.Volley;
     String fechafinal;
     String habitacion="101";
     String TiempoRES;
-    int newaudio=1;
-    int numEvento=0;
+    int numEvento=1;
     long difh,difm,difs = 0;
     //String localizacion = "/storage/emulated/0/Pictures/Messenger";
     //Uri uri = Uri.parse(localizacion); //esto se usa para reproducir url de internet
@@ -86,7 +85,11 @@ import com.android.volley.toolbox.Volley;
             @Override
             public void onClick(View v) {
                // WEBSERVICE("https://localhost:44370/WebService1.asmx");/////////////////////////////////////////////////////////PONER UN URL NO USAR POR EL MOMENTO
-                //reconocer();
+                date = new Date();
+                fechafinal = dateFormat.format(date);
+                turno();
+                horaD0 = new Date();
+                fecha.setText("FECHA: "+fechafinal+"\nHORA: "+horafinal+"\nHABITACION: "+habitacion+"\nTURNO: " +turno+"\nFOLIO: "+numEvento);
                 numEvento=numEvento+1;
             }
         });
@@ -95,7 +98,6 @@ import com.android.volley.toolbox.Volley;
             ASISTENCIA.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
-                    numEvento=numEvento+1;
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
                             if (!presionado) {
@@ -105,8 +107,10 @@ import com.android.volley.toolbox.Volley;
                                 fechafinal = dateFormat.format(date);
                                 turno();
                                 horaD0 = new Date();
-                                fecha.setText(fechafinal+"  "+horafinal+"  "+habitacion+"  " +turno);
+                                fecha.setText("FECHA: "+fechafinal+"\nHORA: "+horafinal+"\nHABITACION: "+habitacion+"\nTURNO: " +turno+"\nFOLIO: "+numEvento);
+                                numEvento=numEvento+1;
                                 //reco();
+                                //reconocer();
                             }
                             break;
                         case MotionEvent.ACTION_UP:
@@ -128,13 +132,12 @@ import com.android.volley.toolbox.Volley;
     }
     ///////////////////////////////////////////////////////grabar audio///////////////////////////////////////////
     public void reco() {
-        outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Fonts/"+ newaudio +"Grabacion.3gp";
+        outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Fonts/"+ numEvento +"Grabacion.mp3";
         miGrabacion = new MediaRecorder();
         miGrabacion.setAudioSource(MediaRecorder.AudioSource.MIC);
         miGrabacion.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS);
         miGrabacion.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
         miGrabacion.setOutputFile(outputFile);
-        newaudio=newaudio+1;
         try {
             miGrabacion.prepare();
             miGrabacion.start();
@@ -145,7 +148,7 @@ import com.android.volley.toolbox.Volley;
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        Toast.makeText(getApplicationContext(), "La grabación comenzó", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "GRABANDO", Toast.LENGTH_LONG).show();
     }
     //////////////////////////////////////////////reproducir audio///////////////////////////////////////////////////////
     public void play() {
@@ -153,7 +156,7 @@ import com.android.volley.toolbox.Volley;
             miGrabacion.stop();
             miGrabacion.release();
             miGrabacion = null;
-            Toast.makeText(getApplicationContext(), "El audio  grabado con éxito", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "AUDIO GRABADO", Toast.LENGTH_LONG).show();
         }
         MediaPlayer m = new MediaPlayer();
         try {
@@ -167,7 +170,7 @@ import com.android.volley.toolbox.Volley;
             e.printStackTrace();
         }
         m.start();
-        Toast.makeText(getApplicationContext(), "reproducción de audio", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "REPRODUCCION EVENTO", Toast.LENGTH_LONG).show();
     }
     //////////////////////////////////////////////////////identificar turno////////////////////////////////////
      public boolean turno() {
@@ -212,22 +215,22 @@ import com.android.volley.toolbox.Volley;
              difm=difs/(60*1000);
              difs= difs%(60*1000);
              difs=difs/1000;
-             TiempoRES = (String.valueOf(difh)+"horas  "+String.valueOf(difm)+"minutos  "+String.valueOf(difs)+"segundos");
+             TiempoRES = (String.valueOf(difh)+"HORAS  "+String.valueOf(difm)+"MINUTOS  "+String.valueOf(difs)+"SEGUNDOS");
              D0 = String.valueOf(horaD0);
              D1 = String.valueOf(horaD1);
              recovoz.setText(TiempoRES+"\n"+D0+"\n"+D1);
          }catch(Exception e){
-             Toast.makeText(getApplicationContext(), "Error con el tiempo de asistencia: ", Toast.LENGTH_LONG).show();
+             Toast.makeText(getApplicationContext(), "ERROR TIEMPO DE ASISTENCIA ", Toast.LENGTH_LONG).show();
          }
      }
     /////////////////////////////////////////////////////////////revisar sd///////////////
     public boolean tarjetaSd() {
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state)) {
-            Toast.makeText(getApplicationContext(), "SD listo", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "SD LISTO", Toast.LENGTH_SHORT).show();
             return true;
         }
-        Toast.makeText(getApplicationContext(), "Error SD", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "ERROR SD", Toast.LENGTH_SHORT).show();
         return false;
     }
     /////////////////////////////////////////////////////////////////////////////////// voz to texto //////////////////////////////////////////////
@@ -240,7 +243,7 @@ import com.android.volley.toolbox.Volley;
                 try {
                     startActivityForResult(intentActionRecognizeSpeech, RECOGNIZE_SPEECH_ACTIVITY);
                 } catch (ActivityNotFoundException a) {
-                    Toast.makeText(getApplicationContext(), "Tú dispositivo no soporta el reconocimiento por voz", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "RECONOCIMIENTO DE VOZ NO SOPORTADO", Toast.LENGTH_SHORT).show();
                 }
             }
         }).start();
@@ -266,7 +269,6 @@ import com.android.volley.toolbox.Volley;
             public void onResponse(String response) {
                 Toast.makeText(getApplicationContext(), "OPERACION EXITOSA", Toast.LENGTH_SHORT).show();
             }
-
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
