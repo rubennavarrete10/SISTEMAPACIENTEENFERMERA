@@ -1,23 +1,26 @@
 package SPE.PKG;
+import android.app.Activity;
+import android.Manifest;
 import android.content.ActivityNotFoundException;
-import android.content.Intent;
-import android.media.AudioManager;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
-import android.net.Uri;
-import android.provider.MediaStore;
-import android.speech.RecognizerIntent;
+import android.os.Environment;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import android.content.Intent;
+import android.net.Uri;
+import android.speech.RecognizerIntent;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
-import java.io.File;
 import java.io.IOException;
-import android.os.Environment;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import android.provider.MediaStore;
 import java.util.Timer;
 import java.util.TimerTask;
 import android.os.Vibrator;
@@ -32,7 +35,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-public class MainActivity extends AppCompatActivity {
+
+
+ public class MainActivity extends AppCompatActivity {
 
     private static final int RECOGNIZE_SPEECH_ACTIVITY = 1;
     TextView fecha;
@@ -40,10 +45,11 @@ public class MainActivity extends AppCompatActivity {
     TextView recovoz;
 
     String localizacion = "/storage/emulated/0/Pictures/Messenger";
-    //String localizacion = "Tarjeta SD/Pictures/Screenshots/file.mp3";
-    //String localizacion = "https://sampleswap.org/samples-ghost/MELODIC%20SAMPLES/GUITARS/146[kb]badmetal2.aif.mp3";///funciona
-    Uri uri = Uri.parse(localizacion);
-    MediaRecorder grabacion = null;
+    Uri uri = Uri.parse(localizacion); //esto se usa para reproducir url de internet
+
+
+    private String outputFile = null;
+    MediaRecorder miGrabacion = null;
     private MediaPlayer player;
 
 
@@ -59,6 +65,10 @@ public class MainActivity extends AppCompatActivity {
         hora = (TextView) findViewById(R.id.hora);
         recovoz= (TextView) findViewById(R.id.timer);
 
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat .requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO}, 1000);
+        }
+
         EMERGENCIA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -67,44 +77,95 @@ public class MainActivity extends AppCompatActivity {
                 String fechafinal = dateFormat.format(date);
                 fecha.setText(fechafinal);
                // WEBSERVICE("https://localhost:44370/WebService1.asmx");/////////////////////////////////////////////////////////PONER UN URL NO USAR POR EL MOMENTO
-               // reconocer();
-                reproducir();
-
+                //reconocer();
+                play();
             }
         });
 
         if (tarjetaSd()== true) {
             ASISTENCIA.setOnClickListener(new View.OnClickListener() {
                 @Override
-
                 public void onClick(View v) {
-
                     SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
                     Date date = new Date();
                     String horafinal = dateFormat.format(date);
                     hora.setText(horafinal);
-                    grabar();
-
+                    reco();
                 }
             });
         }
+
+
     }
-/////////////////////////////////////////////////////////////////////////////////// voz to texto //////////////////////////////////////////////
+    ///////////////////////////////////////////////////////grabar audio///////////////////////////////////////////
+    public void reco() {
+        outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Fonts/Grabacion.3gp";
+        miGrabacion = new MediaRecorder();
+        miGrabacion.setAudioSource(MediaRecorder.AudioSource.MIC);
+        miGrabacion.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS);
+        miGrabacion.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
+        miGrabacion.setOutputFile(outputFile);
+        try {
+            miGrabacion.prepare();
+            miGrabacion.start();
+        } catch (IllegalStateException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        Toast.makeText(getApplicationContext(), "La grabación comenzó", Toast.LENGTH_LONG).show();
+    }
+
+    public void play() {
+        if (miGrabacion != null) {
+            miGrabacion.stop();
+            miGrabacion.release();
+            miGrabacion = null;
+            Toast.makeText(getApplicationContext(), "El audio  grabado con éxito", Toast.LENGTH_LONG).show();
+        }
+        MediaPlayer m = new MediaPlayer();
+        try {
+            m.setDataSource(outputFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            m.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        m.start();
+        Toast.makeText(getApplicationContext(), "reproducción de audio", Toast.LENGTH_LONG).show();
+    }
+
+    /////////////////////////////////////////////////////////////revisar sd///////////////
+    public boolean tarjetaSd() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            Toast.makeText(getApplicationContext(), "SD listo", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        Toast.makeText(getApplicationContext(), "Error SD", Toast.LENGTH_SHORT).show();
+        return false;
+    }
+    /////////////////////////////////////////////////////////////////////////////////// voz to texto //////////////////////////////////////////////
     private void reconocer(){
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Intent intentActionRecognizeSpeech = new Intent(
-                        RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-                intentActionRecognizeSpeech.putExtra(
-                        RecognizerIntent.EXTRA_LANGUAGE_MODEL, "es-MX");
+                Intent intentActionRecognizeSpeech = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                intentActionRecognizeSpeech.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "es-MX");
+
                 try {
-                    startActivityForResult(intentActionRecognizeSpeech,
-                            RECOGNIZE_SPEECH_ACTIVITY);
+
+                    startActivityForResult(intentActionRecognizeSpeech, RECOGNIZE_SPEECH_ACTIVITY);
+
                 } catch (ActivityNotFoundException a) {
-                    Toast.makeText(getApplicationContext(),
-                            "Tú dispositivo no soporta el reconocimiento por voz",
-                            Toast.LENGTH_SHORT).show();
+
+
+                    Toast.makeText(getApplicationContext(), "Tú dispositivo no soporta el reconocimiento por voz", Toast.LENGTH_SHORT).show();
                 }
             }
         }).start();
@@ -116,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case RECOGNIZE_SPEECH_ACTIVITY:
                 if (resultCode == RESULT_OK && null != data) {
+
                     ArrayList<String> speech = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     String strSpeech2Text = speech.get(0);
                     recovoz.setText(strSpeech2Text);
@@ -123,8 +185,8 @@ public class MainActivity extends AppCompatActivity {
             default:
                 break;
         }
-}
-////////////////////////////////////////////////////////////webservice///////////////////////////////////////////////////////////////////////////////////
+    }
+    ////////////////////////////////////////////////////////////webservice///////////////////////////////////////////////////////////////////////////////////
     private void WEBSERVICE (String URL){
         StringRequest request= new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
             @Override
@@ -148,68 +210,4 @@ public class MainActivity extends AppCompatActivity {
         RequestQueue requestQueue= Volley.newRequestQueue(this);
         requestQueue.add(request);
     }
-    ///////////////////////////////////////////////////////grabar audio///////////////////////////////////////////
-    public void grabar (){
-        if(grabacion == null){
-
-            grabacion = new MediaRecorder();
-            grabacion.setAudioSource(MediaRecorder.AudioSource.MIC);
-            grabacion.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-            grabacion.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
-            grabacion.setOutputFile(localizacion);//////////////////////////////////////////////////////////////////error al sacar el archivo de audio
-            Toast.makeText(getApplicationContext(), "empezaste a grabar", Toast.LENGTH_SHORT).show();
-            try {
-                grabacion.prepare();
-                grabacion.start();
-            }
-            catch (IOException e){
-
-            }
-        }else if (grabacion != null){
-            grabacion.stop();
-            grabacion.release();
-            grabacion = null;
-            Toast.makeText(getApplicationContext(), "dejaste de grabar", Toast.LENGTH_SHORT).show();
-        }
-    }
-    ///////////////////////////////////////////////////////////reproducir audio/////////////////////
-    public void reproducir (){
-        if(grabacion == null){
-            player = new MediaPlayer();
-            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            try {
-                player.setDataSource(getApplicationContext(),uri);
-                player.prepareAsync();
-                player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                    @Override
-                    public void onPrepared(MediaPlayer mediaPlayer) {
-                        Toast.makeText(getApplicationContext(), "Reproduciendo audio", Toast.LENGTH_SHORT).show();
-                        if (player.isPlaying()){
-                            player.pause();
-                        }else{
-                            player.start();
-                        }
-                    }
-                });
-            }
-            catch (IOException e){
-
-            }
-            player = MediaPlayer.create(this, uri);
-            Toast.makeText(getApplicationContext(), "No se puede reproducir", Toast.LENGTH_SHORT).show();
-        }
-    }
-    /////////////////////////////////////////////////////////////revisar sd///////////////
-    public boolean tarjetaSd() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            Toast.makeText(getApplicationContext(), "SD listo", Toast.LENGTH_SHORT).show();
-            return true;
-        }
-        Toast.makeText(getApplicationContext(), "Error SD", Toast.LENGTH_SHORT).show();
-        return false;
-    }
-    ///////////////////////////////////////////crear archivos ///////////////////////////////
-
 }
-
