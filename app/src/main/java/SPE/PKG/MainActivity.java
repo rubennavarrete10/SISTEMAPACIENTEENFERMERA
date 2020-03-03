@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
     //String localizacion = "Tarjeta SD/Pictures/Screenshots/file.mp3";
     //String localizacion = "https://sampleswap.org/samples-ghost/MELODIC%20SAMPLES/GUITARS/146[kb]badmetal2.aif.mp3";///funciona
     Uri uri = Uri.parse(localizacion);
-
     MediaRecorder grabacion = null;
     private MediaPlayer player;
 
