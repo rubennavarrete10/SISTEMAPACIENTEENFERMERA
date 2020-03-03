@@ -45,7 +45,7 @@ import com.android.volley.toolbox.Volley;
     TextView hora;
     TextView recovoz;
     SimpleDateFormat horaFormat = new SimpleDateFormat("HH:mm:ss");
-    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy"); ;
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); ;
     Date horaD,horaD1,horaD0;
     Date date;
     String D0,D1;
@@ -103,12 +103,12 @@ import com.android.volley.toolbox.Volley;
                                 turno();
                                 horaD0 = new Date();
                                 fecha.setText(fechafinal+"  "+horafinal+"  "+habitacion+"  " +turno);
-                                reco();
+                                //reco();
                             }
                             break;
                         case MotionEvent.ACTION_UP:
                             presionado = false;
-                            play();
+                            //play();
                             Toast.makeText(getApplicationContext(), "DEJO DE GRABAR", Toast.LENGTH_LONG).show();
                             break;
                     }
@@ -120,7 +120,6 @@ import com.android.volley.toolbox.Volley;
             @Override
             public void onClick(View v) {
                 try {
-
                     horaD1 = new Date();
                     difs = Math.abs(horaD0.getTime() - horaD1.getTime());
                     difh=difs/(60*60*1000);
@@ -128,20 +127,15 @@ import com.android.volley.toolbox.Volley;
                     difm=difs/(60*1000);
                     difs= difs%(60*1000);
                     difs=difs/1000;
-
-
-
                     TiempoRES = (String.valueOf(difh)+"horas  "+String.valueOf(difm)+"minutos  "+String.valueOf(difs)+"segundos");
                     D0 = String.valueOf(horaD0);
                     D1 = String.valueOf(horaD1);
-                    recovoz.setText(TiempoRES+"  "+D0+"  "+D1);
+                    recovoz.setText(TiempoRES+"\n"+D0+"\n"+D1);
                 }catch(Exception e){
                     Toast.makeText(getApplicationContext(), "Error con el tiempo de asistencia: ", Toast.LENGTH_LONG).show();
                 }
             }
         });
-
-
     }
     ///////////////////////////////////////////////////////grabar audio///////////////////////////////////////////
     public void reco() {
@@ -205,16 +199,16 @@ import com.android.volley.toolbox.Volley;
              date6 = horaFormat.parse(hora6);
              horaD = horaFormat.parse(horafinal);
              if ((date1.compareTo(horaD) <= 0) && (date2.compareTo(horaD) >= 0)){
-                 turno = "noche";
+                 turno = "NOCHE";
              }
              if((date3.compareTo(horaD) <= 0) && (date4.compareTo(horaD) >= 0)){
-                 turno ="Mañana";
+                 turno ="MAÑANA";
              }
              if((date5.compareTo(horaD) <= 0) && (date6.compareTo(horaD) >= 0)){
-                 turno= "Tarde";
+                 turno= "TARDE";
              }
          } catch (ParseException e){
-             turno= "Error";
+             turno= "ERROR";
          }
          return false;
      }
