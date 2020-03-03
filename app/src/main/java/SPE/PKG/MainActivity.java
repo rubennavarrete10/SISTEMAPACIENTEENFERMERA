@@ -55,6 +55,7 @@ import com.android.volley.toolbox.Volley;
     String habitacion="101";
     String TiempoRES;
     int newaudio=1;
+    int numEvento=0;
     long difh,difm,difs = 0;
     //String localizacion = "/storage/emulated/0/Pictures/Messenger";
     //Uri uri = Uri.parse(localizacion); //esto se usa para reproducir url de internet
@@ -86,6 +87,7 @@ import com.android.volley.toolbox.Volley;
             public void onClick(View v) {
                // WEBSERVICE("https://localhost:44370/WebService1.asmx");/////////////////////////////////////////////////////////PONER UN URL NO USAR POR EL MOMENTO
                 //reconocer();
+                numEvento=numEvento+1;
             }
         });
 
@@ -93,6 +95,7 @@ import com.android.volley.toolbox.Volley;
             ASISTENCIA.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
+                    numEvento=numEvento+1;
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
                             if (!presionado) {
@@ -119,21 +122,7 @@ import com.android.volley.toolbox.Volley;
         ASISTENCIAHECHA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    horaD1 = new Date();
-                    difs = Math.abs(horaD0.getTime() - horaD1.getTime());
-                    difh=difs/(60*60*1000);
-                    difs= difs%(60*60*1000);
-                    difm=difs/(60*1000);
-                    difs= difs%(60*1000);
-                    difs=difs/1000;
-                    TiempoRES = (String.valueOf(difh)+"horas  "+String.valueOf(difm)+"minutos  "+String.valueOf(difs)+"segundos");
-                    D0 = String.valueOf(horaD0);
-                    D1 = String.valueOf(horaD1);
-                    recovoz.setText(TiempoRES+"\n"+D0+"\n"+D1);
-                }catch(Exception e){
-                    Toast.makeText(getApplicationContext(), "Error con el tiempo de asistencia: ", Toast.LENGTH_LONG).show();
-                }
+                TasisEnf();
             }
         });
     }
@@ -158,7 +147,7 @@ import com.android.volley.toolbox.Volley;
         }
         Toast.makeText(getApplicationContext(), "La grabación comenzó", Toast.LENGTH_LONG).show();
     }
-
+    //////////////////////////////////////////////reproducir audio///////////////////////////////////////////////////////
     public void play() {
         if (miGrabacion != null) {
             miGrabacion.stop();
@@ -180,6 +169,7 @@ import com.android.volley.toolbox.Volley;
         m.start();
         Toast.makeText(getApplicationContext(), "reproducción de audio", Toast.LENGTH_LONG).show();
     }
+    //////////////////////////////////////////////////////identificar turno////////////////////////////////////
      public boolean turno() {
          try {
              horaD = new Date();
@@ -211,6 +201,24 @@ import com.android.volley.toolbox.Volley;
              turno= "ERROR";
          }
          return false;
+     }
+     ///////////////////////////////////////////////tiempo de respuesta////////////////////////////////////////////////////////
+     public void TasisEnf(){
+         try {
+             horaD1 = new Date();
+             difs = Math.abs(horaD0.getTime() - horaD1.getTime());
+             difh=difs/(60*60*1000);
+             difs= difs%(60*60*1000);
+             difm=difs/(60*1000);
+             difs= difs%(60*1000);
+             difs=difs/1000;
+             TiempoRES = (String.valueOf(difh)+"horas  "+String.valueOf(difm)+"minutos  "+String.valueOf(difs)+"segundos");
+             D0 = String.valueOf(horaD0);
+             D1 = String.valueOf(horaD1);
+             recovoz.setText(TiempoRES+"\n"+D0+"\n"+D1);
+         }catch(Exception e){
+             Toast.makeText(getApplicationContext(), "Error con el tiempo de asistencia: ", Toast.LENGTH_LONG).show();
+         }
      }
     /////////////////////////////////////////////////////////////revisar sd///////////////
     public boolean tarjetaSd() {
@@ -245,7 +253,7 @@ import com.android.volley.toolbox.Volley;
                 if (resultCode == RESULT_OK && null != data) {
                     ArrayList<String> speech = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     String strSpeech2Text = speech.get(0);
-                    recovoz.setText(strSpeech2Text);
+                    hora.setText(strSpeech2Text);
                 }
             default:
                 break;

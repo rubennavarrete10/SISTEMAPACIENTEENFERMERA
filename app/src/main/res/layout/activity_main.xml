@@ -58,10 +58,10 @@
 
     <TextView
         android:id="@+id/hora"
-        android:layout_width="136dp"
-        android:layout_height="61dp"
-        android:layout_marginStart="256dp"
-        android:layout_marginTop="224dp"
+        android:layout_width="375dp"
+        android:layout_height="127dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="508dp"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="parent" />
 
