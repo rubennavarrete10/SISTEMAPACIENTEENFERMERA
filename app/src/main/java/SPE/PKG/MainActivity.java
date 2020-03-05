@@ -66,7 +66,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
     String TiempoRES="SIN RESPUESTA";
     String enfermera = "LAURA MARTINEZ ESPINOSA";
     long numEvento = 1;
-    long difh, difm, difs = 0;
+    long idEorA,difh, difm, difs = 0;
     //String localizacion = "/storage/emulated/0/Pictures/Messenger";
     //Uri uri = Uri.parse(localizacion); //esto se usa para reproducir url de internet
     private String outputFile = null;
@@ -98,11 +98,12 @@ public class MainActivity<ca> extends AppCompatActivity  {
         EMERGENCIA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                idEorA=1;
                 date = new Date();
                 fechafinal = dateFormat.format(date);
                 turno();
                 horaD0 = new Date();
-                sendHTTPRequest();
+                sendHTTPRequestE();
                 fecha.setText("EMERGENCIA\nFECHA: " + fechafinal + "\nHORA: " + horafinal + "\nHABITACION: " + habitacion + "\nTURNO: " + turno + "\nFOLIO: " + numEvento + "\nENFEREMERA:" + enfermera);
                 numEvento = numEvento + 1;
             }
@@ -120,17 +121,16 @@ public class MainActivity<ca> extends AppCompatActivity  {
                                 fechafinal = dateFormat.format(date);
                                 turno();
                                 horaD0 = new Date();
-                                reco();
-                                reconocer();
+                                //reco();
+                                //reconocer();
                                 fecha.setText("ASISTENCIA\nFECHA: " + fechafinal + "\nHORA: " + horafinal + "\nHABITACION: " + habitacion + "\nTURNO: " + turno + "\nFOLIO: " + numEvento + "\nENFEREMERA:" + enfermera);
-                                numEvento = numEvento + 1;
-
                             }
                             break;
                         case MotionEvent.ACTION_UP:
                             presionado = false;
-                            play();
+                            //play();
                             sendHTTPRequest();
+                            numEvento = numEvento + 1;
                             Toast.makeText(getApplicationContext(), "DEJO DE GRABAR", Toast.LENGTH_LONG).show();
                             break;
                     }
@@ -143,6 +143,13 @@ public class MainActivity<ca> extends AppCompatActivity  {
             public void onClick(View v) {
                 TasisEnf();
                 fecha.setText("");
+                if(idEorA==1) {
+                    updateHTTPRequestE();
+                }else if (idEorA ==0 ) {
+                    updateHTTPRequest();
+                }
+                idEorA=0;
+                TiempoRES="SIN RESPUESTA";
             }
         });
     }
@@ -289,9 +296,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
     ////////////////////////////////////////////WEB SERVICES ESCRIBIR EN BASE DE DATOS/////////////////
     public void sendHTTPRequest() {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
-        //String folio =String.valueOf(numEvento);
         String url = "http://192.168.0.15/BDSEP/wsJSONRegistro.php?FOLIO=5&FECHA=2&HORA=3&TURNO=4&HABITACION=5&ENFERMERA=6&TIEMPORESPUESTA=2555";
-
         String url1 = "http://192.168.0.15/BDSEP/wsJSONRegistro.php?FOLIODISPOSITIVO="+numEvento+"&FECHA="+fechafinal+"&HORA="+horafinal+"&TURNO="+turno+"&HABITACION="+habitacion+"&ENFERMERA="+enfermera+"&TIEMPORESPUESTA="+TiempoRES;
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
@@ -307,7 +312,68 @@ public class MainActivity<ca> extends AppCompatActivity  {
                 Toast.makeText(getApplicationContext(), "NO SE REGISTRO  sendHTTP", Toast.LENGTH_SHORT).show();
             }
         }) {
+        };
+        MyRequestQueue.add(MyStringRequest);
+    }
+    /////////////////////////////////WEB SERVICE MODIFICAR TIEMPORESPUESTA////////////////////////
+    public void updateHTTPRequest() {
+        RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
+        String url1 = "http://192.168.0.15/BDSEP/wsJSONRegistroUpdate.php?FOLIODISPOSITIVO="+(numEvento-1)+"&TIEMPORESPUESTA="+TiempoRES;
+        url1 = url1.replace(" ", "%20");
+        StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                //This code is executed if the server responds, whether or not the response contains data.
+                Toast.makeText(getApplicationContext(), "REGISTRO ACTUALIZADO", Toast.LENGTH_SHORT).show();
+            }
+        }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                hora.setText(error.toString());
+                Toast.makeText(getApplicationContext(), "NO SE actualizo", Toast.LENGTH_SHORT).show();
+            }
+        }) {
+        };
+        MyRequestQueue.add(MyStringRequest);
+    }
 
+    public void sendHTTPRequestE() {
+        RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
+        String url1 = "http://192.168.0.15/BDSEP/wsJSONRegistroEmergencia.php?FOLIODISPOSITIVO="+numEvento+"&FECHA="+fechafinal+"&HORA="+horafinal+"&TURNO="+turno+"&HABITACION="+habitacion+"&ENFERMERA="+enfermera+"&TIEMPORESPUESTA="+TiempoRES;
+        url1 = url1.replace(" ", "%20");
+        StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                //This code is executed if the server responds, whether or not the response contains data.
+                Toast.makeText(getApplicationContext(), "REGISTRO EXITOSO sendHTTP", Toast.LENGTH_SHORT).show();
+            }
+        }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                hora.setText(error.toString());
+                Toast.makeText(getApplicationContext(), "NO SE REGISTRO  sendHTTP", Toast.LENGTH_SHORT).show();
+            }
+        }) {
+        };
+        MyRequestQueue.add(MyStringRequest);
+    }
+    public void updateHTTPRequestE() {
+        RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
+        String url1 = "http://192.168.0.15/BDSEP/wsJSONRegistroUpdateE.php?FOLIODISPOSITIVO="+(numEvento-1)+"&TIEMPORESPUESTA="+TiempoRES;
+        url1 = url1.replace(" ", "%20");
+        StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                //This code is executed if the server responds, whether or not the response contains data.
+                Toast.makeText(getApplicationContext(), "REGISTRO ACTUALIZADO", Toast.LENGTH_SHORT).show();
+            }
+        }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                hora.setText(error.toString());
+                Toast.makeText(getApplicationContext(), "NO SE actualizo", Toast.LENGTH_SHORT).show();
+            }
+        }) {
         };
         MyRequestQueue.add(MyStringRequest);
     }
