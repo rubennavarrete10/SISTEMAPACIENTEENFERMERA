@@ -1,7 +1,9 @@
 package SPE.PKG;
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.ActivityNotFoundException;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -72,12 +74,12 @@ public class MainActivity<ca> extends AppCompatActivity  {
     private boolean presionado = false;
     private Object VolleySingleton;
 
-    public MainActivity() throws CertificateException, FileNotFoundException, KeyStoreException, NoSuchAlgorithmException {
-    }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_main);
         tarjetaSd();
 
