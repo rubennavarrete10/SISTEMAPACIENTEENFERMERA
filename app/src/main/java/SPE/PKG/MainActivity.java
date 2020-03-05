@@ -55,7 +55,6 @@ public class MainActivity<ca> extends AppCompatActivity  {
     TextView recovoz;
     SimpleDateFormat horaFormat = new SimpleDateFormat("HH:mm:ss");
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-    ;
     Date horaD, horaD1, horaD0;
     Date date;
     String D0, D1;
@@ -67,8 +66,6 @@ public class MainActivity<ca> extends AppCompatActivity  {
     String enfermera = "LAURA MARTINEZ ESPINOSA";
     long numEvento = 1;
     long idEorA,difh, difm, difs = 0;
-    //String localizacion = "/storage/emulated/0/Pictures/Messenger";
-    //Uri uri = Uri.parse(localizacion); //esto se usa para reproducir url de internet
     private String outputFile = null;
     MediaRecorder miGrabacion = null;
     private MediaPlayer player;
