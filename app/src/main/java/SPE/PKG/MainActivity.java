@@ -18,51 +18,27 @@ import android.content.Intent;
 import android.speech.RecognizerIntent;
 import android.widget.Button;
 import android.widget.TextView;
-
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.android.volley.toolbox.JsonObjectRequest;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-
-
 public class MainActivity<ca> extends AppCompatActivity  {
 
     private static final int RECOGNIZE_SPEECH_ACTIVITY = 1;
-    TextView fecha;
-    TextView hora;
-    TextView recovoz;
+    TextView fecha,hora,recovoz;
     SimpleDateFormat horaFormat = new SimpleDateFormat("HH:mm:ss");
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-    Date horaD, horaD1, horaD0;
-    Date date;
-    String D0, D1;
-    String horafinal;
-    String turno;
-    String fechafinal;
+    Date horaD, horaD1, horaD0,date;
+    String D0, D1,horafinal,turno,fechafinal,AE;
     String habitacion = "101";
     String TiempoRES="SIN RESPUESTA";
     String enfermera = "LAURA MARTINEZ ESPINOSA";
@@ -73,7 +49,6 @@ public class MainActivity<ca> extends AppCompatActivity  {
     private MediaPlayer player;
     private boolean presionado = false;
     private Object VolleySingleton;
-
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
@@ -86,6 +61,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
         Button ASISTENCIA = (Button) findViewById(R.id.ASISTENCIA);
         Button ASISTENCIAHECHA = (Button) findViewById(R.id.ASISTENCIAHECHA);
         Button EMERGENCIA = (Button) findViewById(R.id.EMERGENCIA);
+
         fecha = (TextView) findViewById(R.id.fecha);
         hora = (TextView) findViewById(R.id.hora);
         recovoz = (TextView) findViewById(R.id.timer);
@@ -93,7 +69,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO}, 1000);
         }
-
+        AE="";
         EMERGENCIA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -105,6 +81,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
                 sendHTTPRequestE();
                 fecha.setText("EMERGENCIA\nFECHA: " + fechafinal + "\nHORA: " + horafinal + "\nHABITACION: " + habitacion + "\nTURNO: " + turno + "\nFOLIO: " + numEvento + "\nENFEREMERA:" + enfermera);
                 numEvento = numEvento + 1;
+                AE="EMERGENCIA";
             }
         });
 
@@ -128,6 +105,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
                         case MotionEvent.ACTION_UP:
                             presionado = false;
                             //play();
+                            AE="ASISTENCIA";
                             sendHTTPRequest();
                             numEvento = numEvento + 1;
                             Toast.makeText(getApplicationContext(), "DEJO DE GRABAR", Toast.LENGTH_LONG).show();
@@ -142,9 +120,10 @@ public class MainActivity<ca> extends AppCompatActivity  {
             public void onClick(View v) {
                 TasisEnf();
                 fecha.setText("");
-                if(idEorA==1) {
+                if(AE.compareTo("EMERGENCIA") == 0) {
                     updateHTTPRequestE();
-                }else if (idEorA ==0 ) {
+                }
+                if(AE.compareTo("ASISTENCIA") == 0) {
                     updateHTTPRequest();
                 }
                 idEorA=0;
@@ -296,7 +275,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
     public void sendHTTPRequest() {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
         String url = "http://192.168.0.15/BDSEP/wsJSONRegistro.php?FOLIO=5&FECHA=2&HORA=3&TURNO=4&HABITACION=5&ENFERMERA=6&TIEMPORESPUESTA=2555";
-        String url1 = "http://192.168.0.15/BDSEP/wsJSONRegistro.php?FOLIODISPOSITIVO="+numEvento+"&FECHA="+fechafinal+"&HORA="+horafinal+"&TURNO="+turno+"&HABITACION="+habitacion+"&ENFERMERA="+enfermera+"&TIEMPORESPUESTA="+TiempoRES;
+        String url1 = "http://192.168.0.15/BDSEP/wsJSONRegistro.php?FOLIODISPOSITIVO="+numEvento+"&TIPODELLAMADO=ASISTENCIA&FECHA="+fechafinal+"&HORA="+horafinal+"&TURNO="+turno+"&HABITACION="+habitacion+"&ENFERMERA="+enfermera+"&TIEMPORESPUESTA="+TiempoRES;
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
             @Override
@@ -338,7 +317,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
 
     public void sendHTTPRequestE() {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
-        String url1 = "http://192.168.0.15/BDSEP/wsJSONRegistroEmergencia.php?FOLIODISPOSITIVO="+numEvento+"&FECHA="+fechafinal+"&HORA="+horafinal+"&TURNO="+turno+"&HABITACION="+habitacion+"&ENFERMERA="+enfermera+"&TIEMPORESPUESTA="+TiempoRES;
+        String url1 = "http://192.168.0.15/BDSEP/wsJSONRegistro.php?FOLIODISPOSITIVO="+numEvento+"&TIPODELLAMADO=EMERGENCIA&FECHA="+fechafinal+"&HORA="+horafinal+"&TURNO="+turno+"&HABITACION="+habitacion+"&ENFERMERA="+enfermera+"&TIEMPORESPUESTA="+TiempoRES;
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
             @Override
