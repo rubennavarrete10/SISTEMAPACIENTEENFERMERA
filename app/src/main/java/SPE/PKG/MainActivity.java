@@ -1,17 +1,19 @@
 package SPE.PKG;
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Application;
 import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Environment;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.content.Intent;
@@ -19,7 +21,6 @@ import android.speech.RecognizerIntent;
 import android.widget.Button;
 import android.widget.TextView;
 import java.io.IOException;
-
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.text.SimpleDateFormat;
@@ -39,16 +40,14 @@ public class MainActivity<ca> extends AppCompatActivity  {
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
     Date horaD, horaD1, horaD0,date;
     String D0, D1,horafinal,turno,fechafinal,AE;
-    String habitacion = "101";
+    String habitacion = "103";
     String TiempoRES="SIN RESPUESTA";
-    String enfermera = "LAURA MARTINEZ ESPINOSA";
+    String enfermera = "N/A";
     long numEvento = 1;
     long idEorA,difh, difm, difs = 0;
     private String outputFile = null;
     MediaRecorder miGrabacion = null;
-    private MediaPlayer player;
     private boolean presionado = false;
-    private Object VolleySingleton;
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
@@ -145,10 +144,10 @@ public class MainActivity<ca> extends AppCompatActivity  {
             miGrabacion.start();
         } catch (IllegalStateException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            alertaRECO();
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            alertaRECO2();
         }
         Toast.makeText(getApplicationContext(), "GRABANDO", Toast.LENGTH_LONG).show();
     }
@@ -165,12 +164,12 @@ public class MainActivity<ca> extends AppCompatActivity  {
         try {
             m.setDataSource(outputFile);
         } catch (IOException e) {
-            e.printStackTrace();
+            alertaPLAY();
         }
         try {
             m.prepare();
         } catch (IOException e) {
-            e.printStackTrace();
+            alertaPLAY2();
         }
         m.start();
         Toast.makeText(getApplicationContext(), "REPRODUCCION EVENTO", Toast.LENGTH_LONG).show();
@@ -205,7 +204,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
                 turno = "TARDE";
             }
         } catch (ParseException e) {
-            turno = "ERROR";
+            alertaturno();
         }
         return false;
     }
@@ -225,7 +224,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
             TiempoRES = (String.valueOf(difh) + "HORAS " + String.valueOf(difm) + "MINUTOS " + String.valueOf(difs) + "SEGUNDOS "+ String.valueOf(D0)+"   " + String.valueOf(D1)+".");
             Toast.makeText(getApplicationContext(), TiempoRES, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "ERROR TIEMPO DE ASISTENCIA ", Toast.LENGTH_LONG).show();
+            alertaTasis();
         }
     }
 
@@ -236,7 +235,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
             Toast.makeText(getApplicationContext(), "SD LISTO", Toast.LENGTH_SHORT).show();
             return true;
         }
-        Toast.makeText(getApplicationContext(), "ERROR SD", Toast.LENGTH_LONG).show();
+        alertaSD();
         return false;
     }
 
@@ -274,20 +273,19 @@ public class MainActivity<ca> extends AppCompatActivity  {
     ////////////////////////////////////////////WEB SERVICES ESCRIBIR EN BASE DE DATOS/////////////////
     public void sendHTTPRequest() {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
-        String url = "http://192.168.0.15/BDSEP/wsJSONRegistro.php?FOLIO=5&FECHA=2&HORA=3&TURNO=4&HABITACION=5&ENFERMERA=6&TIEMPORESPUESTA=2555";
-        String url1 = "http://192.168.0.15/BDSEP/wsJSONRegistro.php?FOLIODISPOSITIVO="+numEvento+"&TIPODELLAMADO=ASISTENCIA&FECHA="+fechafinal+"&HORA="+horafinal+"&TURNO="+turno+"&HABITACION="+habitacion+"&ENFERMERA="+enfermera+"&TIEMPORESPUESTA="+TiempoRES;
+        String url1 = "http://192.168.0.15/BDSEP/REGISTROEVENTOS.php?FOLIODISPOSITIVO="+numEvento+"&TIPODELLAMADO=ASISTENCIA&FECHA="+fechafinal+"&HORA="+horafinal+"&TURNO="+turno+"&HABITACION="+habitacion+"&ENFERMERA="+enfermera+"&TIEMPORESPUESTA="+TiempoRES;
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 //This code is executed if the server responds, whether or not the response contains data.
-                Toast.makeText(getApplicationContext(), "REGISTRO EXITOSO sendHTTP", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "REGISTRO EXITOSO ASISTENCIA", Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
             @Override
             public void onErrorResponse(VolleyError error) {
                 hora.setText(error.toString());
-                Toast.makeText(getApplicationContext(), "NO SE REGISTRO  sendHTTP", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "NO SE REGISTRO  ASISTENCIA", Toast.LENGTH_SHORT).show();
             }
         }) {
         };
@@ -296,19 +294,19 @@ public class MainActivity<ca> extends AppCompatActivity  {
     /////////////////////////////////WEB SERVICE MODIFICAR TIEMPORESPUESTA////////////////////////
     public void updateHTTPRequest() {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
-        String url1 = "http://192.168.0.15/BDSEP/wsJSONRegistroUpdate.php?FOLIODISPOSITIVO="+(numEvento-1)+"&TIEMPORESPUESTA="+TiempoRES;
+        String url1="http://192.168.0.15/BDSEP/UPDATETIEMPOASISTENCIA.php?FOLIODISPOSITIVO="+(numEvento-1)+"&TIPODELLAMADO=ASISTENCIA&FECHA="+fechafinal+"&HORA="+horafinal+"&HABITACION="+habitacion+"&TIEMPORESPUESTA="+TiempoRES;
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 //This code is executed if the server responds, whether or not the response contains data.
-                Toast.makeText(getApplicationContext(), "REGISTRO ACTUALIZADO", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "TIEMPO DE RESPUESTA ACTUALIZADO", Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
             @Override
             public void onErrorResponse(VolleyError error) {
                 hora.setText(error.toString());
-                Toast.makeText(getApplicationContext(), "NO SE actualizo", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "NO SE ACTUALIZO TIEMPO DE RESPUESTA", Toast.LENGTH_SHORT).show();
             }
         }) {
         };
@@ -317,19 +315,19 @@ public class MainActivity<ca> extends AppCompatActivity  {
 
     public void sendHTTPRequestE() {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
-        String url1 = "http://192.168.0.15/BDSEP/wsJSONRegistro.php?FOLIODISPOSITIVO="+numEvento+"&TIPODELLAMADO=EMERGENCIA&FECHA="+fechafinal+"&HORA="+horafinal+"&TURNO="+turno+"&HABITACION="+habitacion+"&ENFERMERA="+enfermera+"&TIEMPORESPUESTA="+TiempoRES;
+        String url1 = "http://192.168.0.15/BDSEP/REGISTROEVENTOS.php?FOLIODISPOSITIVO="+numEvento+"&TIPODELLAMADO=EMERGENCIA&FECHA="+fechafinal+"&HORA="+horafinal+"&TURNO="+turno+"&HABITACION="+habitacion+"&ENFERMERA="+enfermera+"&TIEMPORESPUESTA="+TiempoRES;
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 //This code is executed if the server responds, whether or not the response contains data.
-                Toast.makeText(getApplicationContext(), "REGISTRO EXITOSO sendHTTP", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "REGISTRO EXITOSO EMERGENCIA", Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
             @Override
             public void onErrorResponse(VolleyError error) {
                 hora.setText(error.toString());
-                Toast.makeText(getApplicationContext(), "NO SE REGISTRO  sendHTTP", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "NO SE REGISTRO  EMERGENCIA", Toast.LENGTH_SHORT).show();
             }
         }) {
         };
@@ -337,22 +335,198 @@ public class MainActivity<ca> extends AppCompatActivity  {
     }
     public void updateHTTPRequestE() {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
-        String url1 = "http://192.168.0.15/BDSEP/wsJSONRegistroUpdateE.php?FOLIODISPOSITIVO="+(numEvento-1)+"&TIEMPORESPUESTA="+TiempoRES;
+        String url1="http://192.168.0.15/BDSEP/UPDATETIEMPOASISTENCIAE.php?FOLIODISPOSITIVO="+(numEvento-1)+"&TIPODELLAMADO=EMERGENCIA&FECHA="+fechafinal+"&HORA="+horafinal+"&HABITACION="+habitacion+"&TIEMPORESPUESTA="+TiempoRES;
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 //This code is executed if the server responds, whether or not the response contains data.
-                Toast.makeText(getApplicationContext(), "REGISTRO ACTUALIZADO", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "TIEMPO DE RESPUESTA ACTUALIZADO", Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
             @Override
             public void onErrorResponse(VolleyError error) {
                 hora.setText(error.toString());
-                Toast.makeText(getApplicationContext(), "NO SE actualizo", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "NO SE ACTUALIZO TIEMPO DE RESPUESTA", Toast.LENGTH_SHORT).show();
             }
         }) {
         };
         MyRequestQueue.add(MyStringRequest);
     }
+    public void alertaturno(){
+        AlertDialog.Builder noeventos = new AlertDialog.Builder(this);
+        noeventos.setTitle("ERROR!");
+        noeventos.setMessage("NO SE PUDO OBTENER TURNO");
+        final AlertDialog noeventosB = noeventos.create();
+        noeventosB.setCanceledOnTouchOutside(true);
+        noeventosB.show();
+
+        final Handler handler  = new Handler();
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (noeventosB.isShowing()) {
+                    noeventosB.dismiss();
+                }
+            }
+        };
+        noeventosB.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                handler.removeCallbacks(runnable);
+            }
+        });
+        handler.postDelayed(runnable, 3000);
+    }
+    public void alertaTasis(){
+        AlertDialog.Builder noeventos = new AlertDialog.Builder(this);
+        noeventos.setTitle("ERROR!");
+        noeventos.setMessage("NO SE PUEDO OBTENER TIEMPO DE RESPUESTA EN LA ASISTENCIA");
+        final AlertDialog noeventosB = noeventos.create();
+        noeventosB.setCanceledOnTouchOutside(true);
+        noeventosB.show();
+
+        final Handler handler  = new Handler();
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (noeventosB.isShowing()) {
+                    noeventosB.dismiss();
+                }
+            }
+        };
+        noeventosB.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                handler.removeCallbacks(runnable);
+            }
+        });
+        handler.postDelayed(runnable, 3000);
+    }
+    public void alertaSD(){
+        AlertDialog.Builder noeventos = new AlertDialog.Builder(this);
+        noeventos.setTitle("ERROR!");
+        noeventos.setMessage("SD DANADA, LLENA, NO DETECTADA");
+        final AlertDialog noeventosB = noeventos.create();
+        noeventosB.setCanceledOnTouchOutside(true);
+        noeventosB.show();
+
+        final Handler handler  = new Handler();
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (noeventosB.isShowing()) {
+                    noeventosB.dismiss();
+                }
+            }
+        };
+        noeventosB.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                handler.removeCallbacks(runnable);
+            }
+        });
+        handler.postDelayed(runnable, 3000);
+    }
+    public void alertaRECO(){
+        AlertDialog.Builder noeventos = new AlertDialog.Builder(this);
+        noeventos.setTitle("ERROR!");
+        noeventos.setMessage("ERROR AL GRABAR AUDIO");
+        final AlertDialog noeventosB = noeventos.create();
+        noeventosB.setCanceledOnTouchOutside(true);
+        noeventosB.show();
+
+        final Handler handler  = new Handler();
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (noeventosB.isShowing()) {
+                    noeventosB.dismiss();
+                }
+            }
+        };
+        noeventosB.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                handler.removeCallbacks(runnable);
+            }
+        });
+        handler.postDelayed(runnable, 3000);
+    }
+    public void alertaRECO2(){
+        AlertDialog.Builder noeventos = new AlertDialog.Builder(this);
+        noeventos.setTitle("ERROR!");
+        noeventos.setMessage("ERROR AL GRABAR AUDIO 2");
+        final AlertDialog noeventosB = noeventos.create();
+        noeventosB.setCanceledOnTouchOutside(true);
+        noeventosB.show();
+
+        final Handler handler  = new Handler();
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (noeventosB.isShowing()) {
+                    noeventosB.dismiss();
+                }
+            }
+        };
+        noeventosB.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                handler.removeCallbacks(runnable);
+            }
+        });
+        handler.postDelayed(runnable, 3000);
+    }
+    public void alertaPLAY(){
+        AlertDialog.Builder noeventos = new AlertDialog.Builder(this);
+        noeventos.setTitle("ERROR!");
+        noeventos.setMessage("ERROR AL OBTENER EL ARCHIVO DE AUDIO");
+        final AlertDialog noeventosB = noeventos.create();
+        noeventosB.setCanceledOnTouchOutside(true);
+        noeventosB.show();
+
+        final Handler handler  = new Handler();
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (noeventosB.isShowing()) {
+                    noeventosB.dismiss();
+                }
+            }
+        };
+        noeventosB.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                handler.removeCallbacks(runnable);
+            }
+        });
+        handler.postDelayed(runnable, 3000);
+    }
+    public void alertaPLAY2(){
+        AlertDialog.Builder noeventos = new AlertDialog.Builder(this);
+        noeventos.setTitle("ERROR!");
+        noeventos.setMessage("ERROR AL PROCESAR ARCHIVO DE AUDIO");
+        final AlertDialog noeventosB = noeventos.create();
+        noeventosB.setCanceledOnTouchOutside(true);
+        noeventosB.show();
+
+        final Handler handler  = new Handler();
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (noeventosB.isShowing()) {
+                    noeventosB.dismiss();
+                }
+            }
+        };
+        noeventosB.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                handler.removeCallbacks(runnable);
+            }
+        });
+        handler.postDelayed(runnable, 3000);
+    }
+
 }
