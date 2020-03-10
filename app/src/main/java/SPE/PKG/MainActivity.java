@@ -40,7 +40,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
     Date horaD, horaD1, horaD0,date;
     String D0, D1,horafinal,turno,fechafinal,AE;
-    String habitacion = "103";
+    String habitacion = "004";
     String TiempoRES="SIN RESPUESTA";
     String enfermera = "N/A";
     long numEvento = 1;
