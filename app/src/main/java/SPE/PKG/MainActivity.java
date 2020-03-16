@@ -134,7 +134,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder login = new AlertDialog.Builder(MainActivity.this);
-                View login = getLayoutInflater().inflate(R.layout.login, null);
+                View Vlogin = getLayoutInflater().inflate(R.layout.login, null);
             }
         });
     }
