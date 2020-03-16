@@ -60,6 +60,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
         Button ASISTENCIA = (Button) findViewById(R.id.ASISTENCIA);
         Button ASISTENCIAHECHA = (Button) findViewById(R.id.ASISTENCIAHECHA);
         Button EMERGENCIA = (Button) findViewById(R.id.EMERGENCIA);
+        Button MOD = (Button) findViewById(R.id.configuracion);
 
         fecha = (TextView) findViewById(R.id.fecha);
         hora = (TextView) findViewById(R.id.hora);
@@ -127,6 +128,13 @@ public class MainActivity<ca> extends AppCompatActivity  {
                 }
                 idEorA=0;
                 TiempoRES="SIN RESPUESTA";
+            }
+        });
+        MOD.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder login = new AlertDialog.Builder(MainActivity.this);
+                View login = getLayoutInflater().inflate(R.layout.login, null);
             }
         });
     }
@@ -273,7 +281,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
     ////////////////////////////////////////////WEB SERVICES ESCRIBIR EN BASE DE DATOS/////////////////
     public void sendHTTPRequest() {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
-        String url1 = "http://192.168.0.15/BDSEP/REGISTROEVENTOS.php?FOLIODISPOSITIVO="+numEvento+"&TIPODELLAMADO=ASISTENCIA&FECHA="+fechafinal+"&HORA="+horafinal+"&TURNO="+turno+"&HABITACION="+habitacion+"&ENFERMERA="+enfermera+"&TIEMPORESPUESTA="+TiempoRES;
+        String url1 = "http://192.168.0.24/BDSEP/REGISTROEVENTOS.php?FOLIODISPOSITIVO="+numEvento+"&TIPODELLAMADO=ASISTENCIA&FECHA="+fechafinal+"&HORA="+horafinal+"&TURNO="+turno+"&HABITACION="+habitacion+"&ENFERMERA="+enfermera+"&TIEMPORESPUESTA="+TiempoRES;
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
             @Override
@@ -294,7 +302,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
     /////////////////////////////////WEB SERVICE MODIFICAR TIEMPORESPUESTA////////////////////////
     public void updateHTTPRequest() {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
-        String url1="http://192.168.0.15/BDSEP/UPDATETIEMPOASISTENCIA.php?FOLIODISPOSITIVO="+(numEvento-1)+"&TIPODELLAMADO=ASISTENCIA&FECHA="+fechafinal+"&HORA="+horafinal+"&HABITACION="+habitacion+"&TIEMPORESPUESTA="+TiempoRES;
+        String url1="http://192.168.0.24/BDSEP/UPDATETIEMPOASISTENCIA.php?FOLIODISPOSITIVO="+(numEvento-1)+"&TIPODELLAMADO=ASISTENCIA&FECHA="+fechafinal+"&HORA="+horafinal+"&HABITACION="+habitacion+"&TIEMPORESPUESTA="+TiempoRES;
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
             @Override
@@ -315,7 +323,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
 
     public void sendHTTPRequestE() {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
-        String url1 = "http://192.168.0.15/BDSEP/REGISTROEVENTOS.php?FOLIODISPOSITIVO="+numEvento+"&TIPODELLAMADO=EMERGENCIA&FECHA="+fechafinal+"&HORA="+horafinal+"&TURNO="+turno+"&HABITACION="+habitacion+"&ENFERMERA="+enfermera+"&TIEMPORESPUESTA="+TiempoRES;
+        String url1 = "http://192.168.0.24/BDSEP/REGISTROEVENTOS.php?FOLIODISPOSITIVO="+numEvento+"&TIPODELLAMADO=EMERGENCIA&FECHA="+fechafinal+"&HORA="+horafinal+"&TURNO="+turno+"&HABITACION="+habitacion+"&ENFERMERA="+enfermera+"&TIEMPORESPUESTA="+TiempoRES;
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
             @Override
@@ -335,7 +343,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
     }
     public void updateHTTPRequestE() {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
-        String url1="http://192.168.0.15/BDSEP/UPDATETIEMPOASISTENCIAE.php?FOLIODISPOSITIVO="+(numEvento-1)+"&TIPODELLAMADO=EMERGENCIA&FECHA="+fechafinal+"&HORA="+horafinal+"&HABITACION="+habitacion+"&TIEMPORESPUESTA="+TiempoRES;
+        String url1="http://192.168.0.24/BDSEP/UPDATETIEMPOASISTENCIAE.php?FOLIODISPOSITIVO="+(numEvento-1)+"&TIPODELLAMADO=EMERGENCIA&FECHA="+fechafinal+"&HORA="+horafinal+"&HABITACION="+habitacion+"&TIEMPORESPUESTA="+TiempoRES;
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
             @Override
@@ -527,6 +535,31 @@ public class MainActivity<ca> extends AppCompatActivity  {
             }
         });
         handler.postDelayed(runnable, 3000);
+    }
+    public void login(){
+
+       /* final AlertDialog noeventosB = noeventos.create();
+        noeventosB.setCanceledOnTouchOutside(true);
+        noeventosB.show();
+
+        final Handler handler  = new Handler();
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+
+                if (noeventosB.isShowing()) {
+                    noeventosB.dismiss();
+                }
+
+            }
+        };
+        noeventosB.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                handler.removeCallbacks(runnable);
+            }
+        });
+        handler.postDelayed(runnable, 3000);*/
     }
 
 }
