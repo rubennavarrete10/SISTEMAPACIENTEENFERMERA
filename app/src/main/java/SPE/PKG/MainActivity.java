@@ -10,8 +10,10 @@ import android.media.MediaRecorder;
 import android.os.Environment;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
@@ -30,24 +32,34 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-public class MainActivity<ca> extends AppCompatActivity  {
 
-    private static final int RECOGNIZE_SPEECH_ACTIVITY = 1;
-    TextView fecha,hora,recovoz;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class MainActivity<ca> extends AppCompatActivity implements Response.ErrorListener, Response.Listener<JSONObject>, login.Datoslogin {
+
+    RequestQueue request1;
+    JSONArray consulta;
+    JsonObjectRequest jsonrequest;
+
+    TextView fecha, hora;
     SimpleDateFormat horaFormat = new SimpleDateFormat("HH:mm:ss");
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-    Date horaD, horaD1, horaD0,date;
-    String D0, D1,horafinal,turno,fechafinal,AE;
-    String habitacion = "004";
-    String TiempoRES="SIN RESPUESTA";
+    Date horaD, horaD1, horaD0, date;
+    String D0, D1, horafinal, turno, fechafinal, AE, ip="192.168.0.16", DISPOSITIVO = "N/A";
+    String habitacion = "N/A";
+    String TiempoRES = "SIN RESPUESTA";
     String enfermera = "N/A";
     long numEvento = 1;
-    long idEorA,difh, difm, difs = 0;
+    long idEorA, difh, difm, difs = 0;
     private String outputFile = null;
     MediaRecorder miGrabacion = null;
     private boolean presionado = false;
+
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
@@ -55,7 +67,6 @@ public class MainActivity<ca> extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_main);
-        tarjetaSd();
 
         Button ASISTENCIA = (Button) findViewById(R.id.ASISTENCIA);
         Button ASISTENCIAHECHA = (Button) findViewById(R.id.ASISTENCIAHECHA);
@@ -64,81 +75,77 @@ public class MainActivity<ca> extends AppCompatActivity  {
 
         fecha = (TextView) findViewById(R.id.fecha);
         hora = (TextView) findViewById(R.id.hora);
-        recovoz = (TextView) findViewById(R.id.timer);
+        request1 = Volley.newRequestQueue(this);
 
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO}, 1000);
         }
-        AE="";
+        leerdisp();
+
+        AE = "";
         EMERGENCIA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                idEorA=1;
+                idEorA = 1;
                 date = new Date();
                 fechafinal = dateFormat.format(date);
                 turno();
                 horaD0 = new Date();
                 sendHTTPRequestE();
-                fecha.setText("EMERGENCIA\nFECHA: " + fechafinal + "\nHORA: " + horafinal + "\nHABITACION: " + habitacion + "\nTURNO: " + turno + "\nFOLIO: " + numEvento + "\nENFEREMERA:" + enfermera);
+                fecha.setText("EMERGENCIA\nFECHA: " + fechafinal + "\nHORA: " + horafinal + "\nHABITACION: " + habitacion + "\nTURNO: " + turno + "\nFOLIO: " + numEvento + "\nENFEREMERA:" + enfermera + "\nDISPOSITIVO:" + DISPOSITIVO);
                 numEvento = numEvento + 1;
-                AE="EMERGENCIA";
+                AE = "EMERGENCIA";
             }
         });
-
-        if (tarjetaSd() == true) {
-            ASISTENCIA.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    switch (event.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            if (!presionado) {
-                                presionado = true;
-                                date = new Date();
-                                fechafinal = dateFormat.format(date);
-                                turno();
-                                horaD0 = new Date();
-                                //reco();
-                                //reconocer();
-                                fecha.setText("ASISTENCIA\nFECHA: " + fechafinal + "\nHORA: " + horafinal + "\nHABITACION: " + habitacion + "\nTURNO: " + turno + "\nFOLIO: " + numEvento + "\nENFEREMERA:" + enfermera);
-                            }
-                            break;
-                        case MotionEvent.ACTION_UP:
-                            presionado = false;
-                            //play();
-                            AE="ASISTENCIA";
-                            sendHTTPRequest();
-                            numEvento = numEvento + 1;
-                            Toast.makeText(getApplicationContext(), "DEJO DE GRABAR", Toast.LENGTH_LONG).show();
-                            break;
-                    }
-                    return true;
+        ASISTENCIA.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        if (!presionado) {
+                            presionado = true;
+                            date = new Date();
+                            fechafinal = dateFormat.format(date);
+                            turno();
+                            horaD0 = new Date();
+                            //reco();
+                            fecha.setText("ASISTENCIA\nFECHA: " + fechafinal + "\nHORA: " + horafinal + "\nHABITACION: " + habitacion + "\nTURNO: " + turno + "\nFOLIO: " + numEvento + "\nENFEREMERA:" + enfermera + "\nDISPOSITIVO:" + DISPOSITIVO);
+                        }
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        presionado = false;
+                        //play();
+                        AE = "ASISTENCIA";
+                        sendHTTPRequest();
+                        numEvento = numEvento + 1;
+                        Toast.makeText(getApplicationContext(), "DEJO DE GRABAR", Toast.LENGTH_LONG).show();
+                        break;
                 }
-            });
-        }
+                return true;
+            }
+        });
         ASISTENCIAHECHA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 TasisEnf();
                 fecha.setText("");
-                if(AE.compareTo("EMERGENCIA") == 0) {
+                if (AE.compareTo("EMERGENCIA") == 0) {
                     updateHTTPRequestE();
                 }
-                if(AE.compareTo("ASISTENCIA") == 0) {
+                if (AE.compareTo("ASISTENCIA") == 0) {
                     updateHTTPRequest();
                 }
-                idEorA=0;
-                TiempoRES="SIN RESPUESTA";
+                idEorA = 0;
+                TiempoRES = "SIN RESPUESTA";
             }
         });
         MOD.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder login = new AlertDialog.Builder(MainActivity.this);
-                View Vlogin = getLayoutInflater().inflate(R.layout.login, null);
+                login();
             }
         });
     }
-
     ///////////////////////////////////////////////////////grabar audio///////////////////////////////////////////
     public void reco() {
         outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Fonts/" + numEvento + "Grabacion.mp3";
@@ -229,67 +236,24 @@ public class MainActivity<ca> extends AppCompatActivity  {
             difs = difs / 1000;
             D0 = String.valueOf(horaD0);
             D1 = String.valueOf(horaD1);
-            TiempoRES = (String.valueOf(difh) + "HORAS " + String.valueOf(difm) + "MINUTOS " + String.valueOf(difs) + "SEGUNDOS "+ String.valueOf(D0)+"   " + String.valueOf(D1)+".");
+            TiempoRES = (String.valueOf(difh) + "HORAS " + String.valueOf(difm) + "MINUTOS " + String.valueOf(difs) + "SEGUNDOS " + String.valueOf(D0) + "   " + String.valueOf(D1) + ".");
             Toast.makeText(getApplicationContext(), TiempoRES, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             alertaTasis();
         }
     }
 
-    /////////////////////////////////////////////////////////////revisar sd///////////////
-    public boolean tarjetaSd() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            Toast.makeText(getApplicationContext(), "SD LISTO", Toast.LENGTH_SHORT).show();
-            return true;
-        }
-        alertaSD();
-        return false;
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////// voz to texto //////////////////////////////////////////////
-    private void reconocer() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Intent intentActionRecognizeSpeech = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-                intentActionRecognizeSpeech.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "es-MX");
-                try {
-                    startActivityForResult(intentActionRecognizeSpeech, RECOGNIZE_SPEECH_ACTIVITY);
-                } catch (ActivityNotFoundException a) {
-                    Toast.makeText(getApplicationContext(), "RECONOCIMIENTO DE VOZ NO SOPORTADO", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }).start();
-    }
-    ///////////////////////////////////////////////////////////////////VOZ TO TEXTO MISMO PROCESO///////////////////////////
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case RECOGNIZE_SPEECH_ACTIVITY:
-                if (resultCode == RESULT_OK && null != data) {
-                    ArrayList<String> speech = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    String strSpeech2Text = speech.get(0);
-                    hora.setText(strSpeech2Text);
-                }
-            default:
-                break;
-        }
-    }
-
     ////////////////////////////////////////////WEB SERVICES ESCRIBIR EN BASE DE DATOS/////////////////
     public void sendHTTPRequest() {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
-        String url1 = "http://192.168.0.24/BDSEP/REGISTROEVENTOS.php?FOLIODISPOSITIVO="+numEvento+"&TIPODELLAMADO=ASISTENCIA&FECHA="+fechafinal+"&HORA="+horafinal+"&TURNO="+turno+"&HABITACION="+habitacion+"&ENFERMERA="+enfermera+"&TIEMPORESPUESTA="+TiempoRES;
+        String url1 = "http://192.168.0.16/BDEJEMPLOS/REGISTROEVENTOS.php?FOLIODISPOSITIVO=" + numEvento + "&TIPODELLAMADO=ASISTENCIA&FECHA=" + fechafinal + "&HORA=" + horafinal + "&TURNO=" + turno + "&HABITACION=" + habitacion + "&ENFERMERA=" + enfermera + "&TIEMPORESPUESTA=" + TiempoRES;
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                //This code is executed if the server responds, whether or not the response contains data.
                 Toast.makeText(getApplicationContext(), "REGISTRO EXITOSO ASISTENCIA", Toast.LENGTH_SHORT).show();
             }
-        }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
+        }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 hora.setText(error.toString());
@@ -299,10 +263,11 @@ public class MainActivity<ca> extends AppCompatActivity  {
         };
         MyRequestQueue.add(MyStringRequest);
     }
+
     /////////////////////////////////WEB SERVICE MODIFICAR TIEMPORESPUESTA////////////////////////
     public void updateHTTPRequest() {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
-        String url1="http://192.168.0.24/BDSEP/UPDATETIEMPOASISTENCIA.php?FOLIODISPOSITIVO="+(numEvento-1)+"&TIPODELLAMADO=ASISTENCIA&FECHA="+fechafinal+"&HORA="+horafinal+"&HABITACION="+habitacion+"&TIEMPORESPUESTA="+TiempoRES;
+        String url1 = "http://192.168.0.16/BDEJEMPLOS/UPDATETIEMPOASISTENCIA.php?FOLIODISPOSITIVO=" + (numEvento - 1) + "&TIPODELLAMADO=ASISTENCIA&FECHA=" + fechafinal + "&HORA=" + horafinal + "&HABITACION=" + habitacion + "&TIEMPORESPUESTA=" + TiempoRES;
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
             @Override
@@ -320,10 +285,9 @@ public class MainActivity<ca> extends AppCompatActivity  {
         };
         MyRequestQueue.add(MyStringRequest);
     }
-
     public void sendHTTPRequestE() {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
-        String url1 = "http://192.168.0.24/BDSEP/REGISTROEVENTOS.php?FOLIODISPOSITIVO="+numEvento+"&TIPODELLAMADO=EMERGENCIA&FECHA="+fechafinal+"&HORA="+horafinal+"&TURNO="+turno+"&HABITACION="+habitacion+"&ENFERMERA="+enfermera+"&TIEMPORESPUESTA="+TiempoRES;
+        String url1 = "http://192.168.0.16/BDEJEMPLOS/REGISTROEVENTOS.php?FOLIODISPOSITIVO=" + numEvento + "&TIPODELLAMADO=EMERGENCIA&FECHA=" + fechafinal + "&HORA=" + horafinal + "&TURNO=" + turno + "&HABITACION=" + habitacion + "&ENFERMERA=" + enfermera + "&TIEMPORESPUESTA=" + TiempoRES;
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
             @Override
@@ -343,7 +307,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
     }
     public void updateHTTPRequestE() {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
-        String url1="http://192.168.0.24/BDSEP/UPDATETIEMPOASISTENCIAE.php?FOLIODISPOSITIVO="+(numEvento-1)+"&TIPODELLAMADO=EMERGENCIA&FECHA="+fechafinal+"&HORA="+horafinal+"&HABITACION="+habitacion+"&TIEMPORESPUESTA="+TiempoRES;
+        String url1 = "http://192.168.0.16/BDEJEMPLOS/UPDATETIEMPOASISTENCIAE.php?FOLIODISPOSITIVO=" + (numEvento - 1) + "&TIPODELLAMADO=EMERGENCIA&FECHA=" + fechafinal + "&HORA=" + horafinal + "&HABITACION=" + habitacion + "&TIEMPORESPUESTA=" + TiempoRES;
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
             @Override
@@ -361,7 +325,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
         };
         MyRequestQueue.add(MyStringRequest);
     }
-    public void alertaturno(){
+    public void alertaturno() {
         AlertDialog.Builder noeventos = new AlertDialog.Builder(this);
         noeventos.setTitle("ERROR!");
         noeventos.setMessage("NO SE PUDO OBTENER TURNO");
@@ -369,7 +333,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
         noeventosB.setCanceledOnTouchOutside(true);
         noeventosB.show();
 
-        final Handler handler  = new Handler();
+        final Handler handler = new Handler();
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -386,7 +350,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
         });
         handler.postDelayed(runnable, 3000);
     }
-    public void alertaTasis(){
+    public void alertaTasis() {
         AlertDialog.Builder noeventos = new AlertDialog.Builder(this);
         noeventos.setTitle("ERROR!");
         noeventos.setMessage("NO SE PUEDO OBTENER TIEMPO DE RESPUESTA EN LA ASISTENCIA");
@@ -394,7 +358,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
         noeventosB.setCanceledOnTouchOutside(true);
         noeventosB.show();
 
-        final Handler handler  = new Handler();
+        final Handler handler = new Handler();
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -411,32 +375,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
         });
         handler.postDelayed(runnable, 3000);
     }
-    public void alertaSD(){
-        AlertDialog.Builder noeventos = new AlertDialog.Builder(this);
-        noeventos.setTitle("ERROR!");
-        noeventos.setMessage("SD DANADA, LLENA, NO DETECTADA");
-        final AlertDialog noeventosB = noeventos.create();
-        noeventosB.setCanceledOnTouchOutside(true);
-        noeventosB.show();
-
-        final Handler handler  = new Handler();
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                if (noeventosB.isShowing()) {
-                    noeventosB.dismiss();
-                }
-            }
-        };
-        noeventosB.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                handler.removeCallbacks(runnable);
-            }
-        });
-        handler.postDelayed(runnable, 3000);
-    }
-    public void alertaRECO(){
+    public void alertaRECO() {
         AlertDialog.Builder noeventos = new AlertDialog.Builder(this);
         noeventos.setTitle("ERROR!");
         noeventos.setMessage("ERROR AL GRABAR AUDIO");
@@ -444,7 +383,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
         noeventosB.setCanceledOnTouchOutside(true);
         noeventosB.show();
 
-        final Handler handler  = new Handler();
+        final Handler handler = new Handler();
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -461,7 +400,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
         });
         handler.postDelayed(runnable, 3000);
     }
-    public void alertaRECO2(){
+    public void alertaRECO2() {
         AlertDialog.Builder noeventos = new AlertDialog.Builder(this);
         noeventos.setTitle("ERROR!");
         noeventos.setMessage("ERROR AL GRABAR AUDIO 2");
@@ -469,7 +408,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
         noeventosB.setCanceledOnTouchOutside(true);
         noeventosB.show();
 
-        final Handler handler  = new Handler();
+        final Handler handler = new Handler();
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -486,7 +425,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
         });
         handler.postDelayed(runnable, 3000);
     }
-    public void alertaPLAY(){
+    public void alertaPLAY() {
         AlertDialog.Builder noeventos = new AlertDialog.Builder(this);
         noeventos.setTitle("ERROR!");
         noeventos.setMessage("ERROR AL OBTENER EL ARCHIVO DE AUDIO");
@@ -494,7 +433,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
         noeventosB.setCanceledOnTouchOutside(true);
         noeventosB.show();
 
-        final Handler handler  = new Handler();
+        final Handler handler = new Handler();
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -511,7 +450,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
         });
         handler.postDelayed(runnable, 3000);
     }
-    public void alertaPLAY2(){
+    public void alertaPLAY2() {
         AlertDialog.Builder noeventos = new AlertDialog.Builder(this);
         noeventos.setTitle("ERROR!");
         noeventos.setMessage("ERROR AL PROCESAR ARCHIVO DE AUDIO");
@@ -519,7 +458,7 @@ public class MainActivity<ca> extends AppCompatActivity  {
         noeventosB.setCanceledOnTouchOutside(true);
         noeventosB.show();
 
-        final Handler handler  = new Handler();
+        final Handler handler = new Handler();
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -536,30 +475,55 @@ public class MainActivity<ca> extends AppCompatActivity  {
         });
         handler.postDelayed(runnable, 3000);
     }
-    public void login(){
 
-       /* final AlertDialog noeventosB = noeventos.create();
-        noeventosB.setCanceledOnTouchOutside(true);
-        noeventosB.show();
 
-        final Handler handler  = new Handler();
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
 
-                if (noeventosB.isShowing()) {
-                    noeventosB.dismiss();
-                }
 
-            }
-        };
-        noeventosB.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                handler.removeCallbacks(runnable);
-            }
-        });
-        handler.postDelayed(runnable, 3000);*/
+    public void login() {
+        login login = new login();
+        login.show(getSupportFragmentManager(), "INICIO SESION");
     }
+    @Override
+    public void applyTexts(String usuario, String contraseña) {
+        if (usuario.equals("USER") == true && contraseña.equals("1234") == true) {
+            Toast.makeText(getApplicationContext(), "SESION INICIADA", Toast.LENGTH_SHORT).show();
+            Intent ListFruta = new Intent(getApplicationContext(), modificardispositivo.class);
+            startActivity(ListFruta);
+        } else {
+            Toast.makeText(getApplicationContext(), "USUARIO O CONTRASEÑA INCORRECTA", Toast.LENGTH_SHORT).show();
+        }
+    }
+    public void leerdisp() {
+        RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
+        String url1 = "http://"+ip+"/BDEJEMPLOS/leerdispositivo.php";
+        jsonrequest = new JsonObjectRequest(Request.Method.POST, url1, null, this, this);////////////////////////////////////////////////////////////json webservices/////////////////
+        request1.add(jsonrequest);
+    }
+    @Override
+    public void onErrorResponse(VolleyError error) {
 
+    }
+    @Override
+    public void onResponse(JSONObject response) {
+        consulta = response.optJSONArray("usuario");
+        try {
+            for (int i = 0; i < consulta.length(); i++) {
+                Usuarios consultaUsuario;
+                consultaUsuario = new Usuarios();
+                JSONObject jsonconsulta = null;
+                jsonconsulta = consulta.getJSONObject(i);
+                consultaUsuario.setIpbd(jsonconsulta.optString("IP"));
+                consultaUsuario.setdisbd(jsonconsulta.optString("NODISPOSITIVO"));
+                consultaUsuario.sethbbd(jsonconsulta.optString("HABITACION"));
+
+                ip = consultaUsuario.getIpbd();
+                habitacion = consultaUsuario.gethbbd();
+                DISPOSITIVO = consultaUsuario.getdisbd();
+
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
 }

@@ -21,9 +21,9 @@
 
     <Button
         android:id="@+id/ASISTENCIA"
-        android:layout_width="319dp"
-        android:layout_height="59dp"
-        android:layout_marginStart="44dp"
+        android:layout_width="249dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="80dp"
         android:layout_marginTop="84dp"
         android:text="ASISTENCIA"
         app:layout_constraintStart_toStartOf="@+id/guideline"
@@ -31,28 +31,28 @@
 
     <Button
         android:id="@+id/EMERGENCIA"
-        android:layout_width="319dp"
-        android:layout_height="58dp"
-        android:layout_marginStart="44dp"
-        android:layout_marginTop="160dp"
+        android:layout_width="250dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="148dp"
         android:text="EMERGENCIA"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/ASISTENCIAHECHA"
-        android:layout_width="231dp"
-        android:layout_height="82dp"
-        android:layout_marginStart="80dp"
-        android:layout_marginTop="360dp"
+        android:layout_width="173dp"
+        android:layout_height="69dp"
+        android:layout_marginStart="128dp"
+        android:layout_marginTop="424dp"
         android:text="ASISTENCIA HECHA"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/fecha"
-        android:layout_width="388dp"
-        android:layout_height="117dp"
+        android:layout_width="181dp"
+        android:layout_height="134dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="228dp"
         app:layout_constraintStart_toStartOf="@+id/guideline"
@@ -60,20 +60,11 @@
 
     <TextView
         android:id="@+id/hora"
-        android:layout_width="389dp"
-        android:layout_height="14dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="468dp"
+        android:layout_width="383dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="364dp"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/timer"
-        android:layout_width="370dp"
-        android:layout_height="15dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="448dp"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline
@@ -84,21 +75,11 @@
         app:layout_constraintGuide_begin="-24dp" />
 
     <Button
-        android:id="@+id/comedor"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="64dp"
-        android:layout_marginTop="492dp"
-        android:text="COMEDOR"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
         android:id="@+id/configuracion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="208dp"
-        android:layout_marginTop="492dp"
+        android:layout_marginStart="256dp"
+        android:layout_marginTop="556dp"
         android:text="CONFIGURACION"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="parent" />
