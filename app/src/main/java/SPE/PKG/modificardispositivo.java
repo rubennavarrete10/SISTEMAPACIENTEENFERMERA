@@ -46,8 +46,8 @@ public class modificardispositivo extends AppCompatActivity implements Response.
     JSONArray consulta;
     JsonObjectRequest jsonrequest;
 
-    EditText host,habitacion,dispositivo;
-    String hs="192.168.0.16",hb,dis;
+    EditText host,habitacion;
+    String hs="192.168.0.16",hb;
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +59,6 @@ public class modificardispositivo extends AppCompatActivity implements Response.
         Button REGRESAR = (Button) findViewById(R.id.REGRESAR);
         host = (EditText) findViewById(R.id.editText);
         habitacion = (EditText)findViewById(R.id.editText2);
-        dispositivo = (EditText) findViewById(R.id.editText3);
         request1 = Volley.newRequestQueue(this);
 
 
@@ -68,7 +67,6 @@ public class modificardispositivo extends AppCompatActivity implements Response.
             public void onClick(View v) {
                 hs=host.getText().toString();
                 hb=habitacion.getText().toString();
-                dis=dispositivo.getText().toString();
                 actualizardisp();
             }
         });
@@ -83,7 +81,7 @@ public class modificardispositivo extends AppCompatActivity implements Response.
 
 
     public void actualizardisp() {
-        String url1 = "http://"+hs+"/BDEJEMPLOS/actualizardisp.php?NODISPOSITIVO="+dis+"&HABITACION="+hb+"&IP="+hs;
+        String url1 = "http://"+hs+"/BDEJEMPLOS/actualizardisp.php?NODISPOSITIVO=1&HABITACION="+hb+"&IP="+hs;
         jsonrequest = new JsonObjectRequest(Request.Method.POST, url1, null, this, this);////////////////////////////////////////////////////////////json webservices/////////////////
         request1.add(jsonrequest);
     }

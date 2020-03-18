@@ -42,23 +42,25 @@ import org.json.JSONObject;
 
 public class MainActivity<ca> extends AppCompatActivity implements Response.ErrorListener, Response.Listener<JSONObject>, login.Datoslogin {
 
+    int a=0;
     RequestQueue request1;
     JSONArray consulta;
     JsonObjectRequest jsonrequest;
-
     TextView fecha, hora;
     SimpleDateFormat horaFormat = new SimpleDateFormat("HH:mm:ss");
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
     Date horaD, horaD1, horaD0, date;
-    String D0, D1, horafinal, turno, fechafinal, AE, ip="192.168.0.16", DISPOSITIVO = "N/A";
+    String D0, D1, horafinal, turno, fechafinal, AE, ip="192.168.0.16", DISPOSITIVO = "1";
     String habitacion = "N/A";
     String TiempoRES = "SIN RESPUESTA";
     String enfermera = "N/A";
+    String PACIENTE="N/A",MEDICO="N/A",PAGO="N/A",ESTACION="N/A",SECCION="N/A";
     long numEvento = 1;
     long idEorA, difh, difm, difs = 0;
     private String outputFile = null;
     MediaRecorder miGrabacion = null;
     private boolean presionado = false;
+    final Handler handler = new Handler();
 
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -80,21 +82,41 @@ public class MainActivity<ca> extends AppCompatActivity implements Response.Erro
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO}, 1000);
         }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        a=1;
         leerdisp();
-
         AE = "";
+
         EMERGENCIA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                idEorA = 1;
-                date = new Date();
-                fechafinal = dateFormat.format(date);
-                turno();
-                horaD0 = new Date();
-                sendHTTPRequestE();
-                fecha.setText("EMERGENCIA\nFECHA: " + fechafinal + "\nHORA: " + horafinal + "\nHABITACION: " + habitacion + "\nTURNO: " + turno + "\nFOLIO: " + numEvento + "\nENFEREMERA:" + enfermera + "\nDISPOSITIVO:" + DISPOSITIVO);
-                numEvento = numEvento + 1;
-                AE = "EMERGENCIA";
+                a=2;
+                leerdisp();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Do something after 5s = 5000ms
+                        a=3;
+                        leerdisp();
+                    }
+                }, 150);
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        idEorA = 1;
+                        date = new Date();
+                        fechafinal = dateFormat.format(date);
+                        turno();
+                        horaD0 = new Date();
+                        sendHTTPRequestE();
+                        fecha.setText("ASISTENCIA\nFECHA: " + fechafinal + "\nHORA: " + horafinal + "\nHABITACION: " + habitacion
+                                + "\nTURNO: " + turno + "\nFOLIO: " + numEvento + "\nENFEREMERA:" + enfermera + "\nDISPOSITIVO:" + DISPOSITIVO
+                                +"\nPACIENTE="+PACIENTE+"\nMEDICO="+MEDICO+"\nPAGO="+PAGO+"\nESTACION=="+ESTACION+"\nSECCION="+SECCION);
+                        numEvento = numEvento + 1;
+                        AE = "EMERGENCIA";
+                    }
+                }, 300);
+
             }
         });
         ASISTENCIA.setOnTouchListener(new View.OnTouchListener() {
@@ -109,16 +131,35 @@ public class MainActivity<ca> extends AppCompatActivity implements Response.Erro
                             turno();
                             horaD0 = new Date();
                             //reco();
-                            fecha.setText("ASISTENCIA\nFECHA: " + fechafinal + "\nHORA: " + horafinal + "\nHABITACION: " + habitacion + "\nTURNO: " + turno + "\nFOLIO: " + numEvento + "\nENFEREMERA:" + enfermera + "\nDISPOSITIVO:" + DISPOSITIVO);
                         }
                         break;
                     case MotionEvent.ACTION_UP:
                         presionado = false;
-                        //play();
-                        AE = "ASISTENCIA";
-                        sendHTTPRequest();
-                        numEvento = numEvento + 1;
-                        Toast.makeText(getApplicationContext(), "DEJO DE GRABAR", Toast.LENGTH_LONG).show();
+                        a=2;
+                        leerdisp();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Do something after 5s = 5000ms
+                                a=3;
+                                leerdisp();
+                            }
+                        }, 150);
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Do something after 5s = 5000ms
+                                //play();
+                                AE = "ASISTENCIA";
+                                sendHTTPRequest();
+                                fecha.setText("ASISTENCIA\nFECHA: " + fechafinal + "\nHORA: " + horafinal + "\nHABITACION: " + habitacion
+                                        + "\nTURNO: " + turno + "\nFOLIO: " + numEvento + "\nENFEREMERA:" + enfermera + "\nDISPOSITIVO:" + DISPOSITIVO
+                                        +"\nPACIENTE="+PACIENTE+"\nMEDICO="+MEDICO+"\nPAGO="+PAGO+"\nESTACION=="+ESTACION+"\nSECCION="+SECCION);
+                                numEvento = numEvento + 1;
+                                Toast.makeText(getApplicationContext(), "DEJO DE GRABAR", Toast.LENGTH_LONG).show();
+                            }
+                        }, 350);
+
                         break;
                 }
                 return true;
@@ -146,7 +187,7 @@ public class MainActivity<ca> extends AppCompatActivity implements Response.Erro
             }
         });
     }
-    ///////////////////////////////////////////////////////grabar audio///////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void reco() {
         outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Fonts/" + numEvento + "Grabacion.mp3";
         miGrabacion = new MediaRecorder();
@@ -165,9 +206,8 @@ public class MainActivity<ca> extends AppCompatActivity implements Response.Erro
             alertaRECO2();
         }
         Toast.makeText(getApplicationContext(), "GRABANDO", Toast.LENGTH_LONG).show();
-    }
 
-    //////////////////////////////////////////////reproducir audio///////////////////////////////////////////////////////
+    }
     public void play() {
         if (miGrabacion != null) {
             miGrabacion.stop();
@@ -189,8 +229,6 @@ public class MainActivity<ca> extends AppCompatActivity implements Response.Erro
         m.start();
         Toast.makeText(getApplicationContext(), "REPRODUCCION EVENTO", Toast.LENGTH_LONG).show();
     }
-
-    //////////////////////////////////////////////////////identificar turno////////////////////////////////////
     public boolean turno() {
         try {
             horaD = new Date();
@@ -223,8 +261,6 @@ public class MainActivity<ca> extends AppCompatActivity implements Response.Erro
         }
         return false;
     }
-
-    ///////////////////////////////////////////////tiempo de respuesta////////////////////////////////////////////////////////
     public void TasisEnf() {
         try {
             horaD1 = new Date();
@@ -242,11 +278,10 @@ public class MainActivity<ca> extends AppCompatActivity implements Response.Erro
             alertaTasis();
         }
     }
-
-    ////////////////////////////////////////////WEB SERVICES ESCRIBIR EN BASE DE DATOS/////////////////
     public void sendHTTPRequest() {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
-        String url1 = "http://192.168.0.16/BDEJEMPLOS/REGISTROEVENTOS.php?FOLIODISPOSITIVO=" + numEvento + "&TIPODELLAMADO=ASISTENCIA&FECHA=" + fechafinal + "&HORA=" + horafinal + "&TURNO=" + turno + "&HABITACION=" + habitacion + "&ENFERMERA=" + enfermera + "&TIEMPORESPUESTA=" + TiempoRES;
+        String url1 = "http://192.168.0.16/BDEJEMPLOS/REGISTROEVENTOS.php?FOLIODISPOSITIVO=" + (numEvento ) + "&TIPODELLAMADO=ASISTENCIA&FECHA=" + fechafinal + "&HORA=" + horafinal+ "&TURNO="+turno+"&HABITACION=" + habitacion +"&ENFERMERA="+enfermera+ "&TIEMPORESPUESTA=" + TiempoRES+"&PACIENTE="
+                +PACIENTE+"&MEDICO="+MEDICO+"&PAGO="+PAGO+"&ESTACION="+ESTACION+"&SECCION="+SECCION+"&AUDIO=AUDIO";
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
             @Override
@@ -263,11 +298,10 @@ public class MainActivity<ca> extends AppCompatActivity implements Response.Erro
         };
         MyRequestQueue.add(MyStringRequest);
     }
-
-    /////////////////////////////////WEB SERVICE MODIFICAR TIEMPORESPUESTA////////////////////////
     public void updateHTTPRequest() {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
-        String url1 = "http://192.168.0.16/BDEJEMPLOS/UPDATETIEMPOASISTENCIA.php?FOLIODISPOSITIVO=" + (numEvento - 1) + "&TIPODELLAMADO=ASISTENCIA&FECHA=" + fechafinal + "&HORA=" + horafinal + "&HABITACION=" + habitacion + "&TIEMPORESPUESTA=" + TiempoRES;
+        String url1 = "http://192.168.0.16/BDEJEMPLOS/UPDATETIEMPOASISTENCIA.php?FOLIODISPOSITIVO=" + (numEvento - 1) + "&TIPODELLAMADO=ASISTENCIA&FECHA=" + fechafinal + "&HORA=" + horafinal
+                + "&HABITACION=" + habitacion + "&TIEMPORESPUESTA=" + TiempoRES+"&PACIENTE="+PACIENTE+"&MEDICO="+MEDICO+"&PAGO="+PAGO+"&ESTACION="+ESTACION+"&SECCION="+SECCION;
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
             @Override
@@ -287,7 +321,8 @@ public class MainActivity<ca> extends AppCompatActivity implements Response.Erro
     }
     public void sendHTTPRequestE() {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
-        String url1 = "http://192.168.0.16/BDEJEMPLOS/REGISTROEVENTOS.php?FOLIODISPOSITIVO=" + numEvento + "&TIPODELLAMADO=EMERGENCIA&FECHA=" + fechafinal + "&HORA=" + horafinal + "&TURNO=" + turno + "&HABITACION=" + habitacion + "&ENFERMERA=" + enfermera + "&TIEMPORESPUESTA=" + TiempoRES;
+        String url1 = "http://192.168.0.16/BDEJEMPLOS/REGISTROEVENTOS.php?FOLIODISPOSITIVO=" + (numEvento ) + "&TIPODELLAMADO=EMERGENCIA&FECHA=" + fechafinal + "&HORA=" + horafinal+ "&TURNO="+turno+"&HABITACION=" + habitacion +"&ENFERMERA="+enfermera+ "&TIEMPORESPUESTA=" + TiempoRES+"&PACIENTE="
+                +PACIENTE+"&MEDICO="+MEDICO+"&PAGO="+PAGO+"&ESTACION="+ESTACION+"&SECCION="+SECCION+"&AUDIO=AUDIO";
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
             @Override
@@ -325,6 +360,7 @@ public class MainActivity<ca> extends AppCompatActivity implements Response.Erro
         };
         MyRequestQueue.add(MyStringRequest);
     }
+
     public void alertaturno() {
         AlertDialog.Builder noeventos = new AlertDialog.Builder(this);
         noeventos.setTitle("ERROR!");
@@ -493,12 +529,27 @@ public class MainActivity<ca> extends AppCompatActivity implements Response.Erro
             Toast.makeText(getApplicationContext(), "USUARIO O CONTRASEÑA INCORRECTA", Toast.LENGTH_SHORT).show();
         }
     }
+
+
+
     public void leerdisp() {
-        RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
-        String url1 = "http://"+ip+"/BDEJEMPLOS/leerdispositivo.php";
-        jsonrequest = new JsonObjectRequest(Request.Method.POST, url1, null, this, this);////////////////////////////////////////////////////////////json webservices/////////////////
-        request1.add(jsonrequest);
+        if(a==1) {
+            String url1 = "http://" + ip + "/BDEJEMPLOS/leerdispositivo.php";
+            jsonrequest = new JsonObjectRequest(Request.Method.POST, url1, null, this, this);////////////////////////////////////////////////////////////json webservices/////////////////
+            request1.add(jsonrequest);
+        }
+        if(a==2) {
+            String url1 = "http://" + ip + "/BDEJEMPLOS/CONSULTARDATOS.php?HABITACION=" + habitacion;
+            jsonrequest = new JsonObjectRequest(Request.Method.POST, url1, null, this, this);////////////////////////////////////////////////////////////json webservices/////////////////
+            request1.add(jsonrequest);
+        }
+        if(a==3) {
+            String url1 = "http://" + ip + "/BDEJEMPLOS/CONSULTARSECCION.php?HABITACION=" + habitacion;
+            jsonrequest = new JsonObjectRequest(Request.Method.POST, url1, null, this, this);////////////////////////////////////////////////////////////json webservices/////////////////
+            request1.add(jsonrequest);
+        }
     }
+
     @Override
     public void onErrorResponse(VolleyError error) {
 
@@ -506,24 +557,68 @@ public class MainActivity<ca> extends AppCompatActivity implements Response.Erro
     @Override
     public void onResponse(JSONObject response) {
         consulta = response.optJSONArray("usuario");
-        try {
-            for (int i = 0; i < consulta.length(); i++) {
-                Usuarios consultaUsuario;
-                consultaUsuario = new Usuarios();
-                JSONObject jsonconsulta = null;
-                jsonconsulta = consulta.getJSONObject(i);
-                consultaUsuario.setIpbd(jsonconsulta.optString("IP"));
-                consultaUsuario.setdisbd(jsonconsulta.optString("NODISPOSITIVO"));
-                consultaUsuario.sethbbd(jsonconsulta.optString("HABITACION"));
-
-                ip = consultaUsuario.getIpbd();
-                habitacion = consultaUsuario.gethbbd();
-                DISPOSITIVO = consultaUsuario.getdisbd();
-
+        if(a==1) {
+            try {
+                for (int i = 0; i < consulta.length(); i++) {
+                    Usuarios consultaUsuario;
+                    consultaUsuario = new Usuarios();
+                    JSONObject jsonconsulta = null;
+                    jsonconsulta = consulta.getJSONObject(i);
+                    consultaUsuario.setIpbd(jsonconsulta.optString("IP"));
+                    consultaUsuario.setdisbd(jsonconsulta.optString("NODISPOSITIVO"));
+                    consultaUsuario.sethbbd(jsonconsulta.optString("HABITACION"));
+                    ip = consultaUsuario.getIpbd();
+                    habitacion = consultaUsuario.gethbbd();
+                    DISPOSITIVO = consultaUsuario.getdisbd();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
+        if (a==2){
+            try {
+                for (int i = 0; i < consulta.length(); i++) {
+                    Usuarios consultaUsuario;
+                    consultaUsuario = new Usuarios();
+                    JSONObject jsonconsulta = null;
+                    jsonconsulta = consulta.getJSONObject(i);
 
+                    consultaUsuario.setIpbd(jsonconsulta.optString("PACIENTE"));
+                    consultaUsuario.setdisbd(jsonconsulta.optString("MEDICO"));
+                    consultaUsuario.sethbbd(jsonconsulta.optString("PAGO"));
+                    PACIENTE = consultaUsuario.getIpbd();
+                    PAGO = consultaUsuario.gethbbd();
+                    MEDICO = consultaUsuario.getdisbd();
+
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        if (a==3){
+            try {
+                for (int i = 0; i < consulta.length(); i++) {
+                    Usuarios consultaUsuario;
+                    consultaUsuario = new Usuarios();
+                    JSONObject jsonconsulta = null;
+                    jsonconsulta = consulta.getJSONObject(i);
+                    consultaUsuario.setIpbd(jsonconsulta.optString("NOESTACION"));
+                    consultaUsuario.setdisbd(jsonconsulta.optString("NOSECCION"));
+                    ESTACION = consultaUsuario.getIpbd();
+                    SECCION = consultaUsuario.getdisbd();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        a=0 ;
     }
+
 }
+/*final Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // Do something after 5s = 5000ms
+                                }
+                            }, 200);*/
