@@ -2,6 +2,7 @@ package SPE.PKG;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -10,6 +11,7 @@ import android.media.MediaRecorder;
 import android.os.Environment;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Base64InputStream;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,6 +24,9 @@ import android.content.Intent;
 import android.speech.RecognizerIntent;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -54,11 +59,16 @@ public class MainActivity<ca> extends AppCompatActivity implements Response.Erro
     String habitacion = "N/A";
     String TiempoRES = "SIN RESPUESTA";
     String enfermera = "N/A";
-    String PACIENTE="N/A",MEDICO="N/A",PAGO="N/A",ESTACION="N/A",SECCION="N/A";
+    String PACIENTE="N/A",MEDICO="N/A",PAGO="N/A",ESTACION="N/A",SECCION="N/A",AUDIO="N/A";
     long numEvento = 1;
     long idEorA, difh, difm, difs = 0;
+
     private String outputFile = null;
     MediaRecorder miGrabacion = null;
+    MediaPlayer m = new MediaPlayer();
+
+
+
     private boolean presionado = false;
     final Handler handler = new Handler();
 
@@ -130,7 +140,7 @@ public class MainActivity<ca> extends AppCompatActivity implements Response.Erro
                             fechafinal = dateFormat.format(date);
                             turno();
                             horaD0 = new Date();
-                            //reco();
+                            reco();
                         }
                         break;
                     case MotionEvent.ACTION_UP:
@@ -149,7 +159,7 @@ public class MainActivity<ca> extends AppCompatActivity implements Response.Erro
                             @Override
                             public void run() {
                                 // Do something after 5s = 5000ms
-                                //play();
+                                play();
                                 AE = "ASISTENCIA";
                                 sendHTTPRequest();
                                 fecha.setText("ASISTENCIA\nFECHA: " + fechafinal + "\nHORA: " + horafinal + "\nHABITACION: " + habitacion
@@ -195,17 +205,23 @@ public class MainActivity<ca> extends AppCompatActivity implements Response.Erro
         miGrabacion.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS);
         miGrabacion.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
         miGrabacion.setOutputFile(outputFile);
-        try {
-            miGrabacion.prepare();
-            miGrabacion.start();
-        } catch (IllegalStateException e) {
-            // TODO Auto-generated catch block
-            alertaRECO();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            alertaRECO2();
-        }
-        Toast.makeText(getApplicationContext(), "GRABANDO", Toast.LENGTH_LONG).show();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // Do something after 5s = 5000ms
+                try {
+                    miGrabacion.prepare();
+                    miGrabacion.start();
+                } catch (IllegalStateException e) {
+                    // TODO Auto-generated catch block
+                    alertaRECO();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    alertaRECO2();
+                }
+                Toast.makeText(getApplicationContext(), "GRABANDO", Toast.LENGTH_LONG).show();
+            }
+        }, 200);
 
     }
     public void play() {
@@ -215,9 +231,17 @@ public class MainActivity<ca> extends AppCompatActivity implements Response.Erro
             miGrabacion = null;
             Toast.makeText(getApplicationContext(), "AUDIO GRABADO", Toast.LENGTH_LONG).show();
         }
-        MediaPlayer m = new MediaPlayer();
         try {
             m.setDataSource(outputFile);
+
+
+
+            ////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+            /////////////////////////////////////////////////////////////////////////////////////////////
         } catch (IOException e) {
             alertaPLAY();
         }
@@ -279,9 +303,10 @@ public class MainActivity<ca> extends AppCompatActivity implements Response.Erro
         }
     }
     public void sendHTTPRequest() {
+
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
         String url1 = "http://192.168.0.16/BDEJEMPLOS/REGISTROEVENTOS.php?FOLIODISPOSITIVO=" + (numEvento ) + "&TIPODELLAMADO=ASISTENCIA&FECHA=" + fechafinal + "&HORA=" + horafinal+ "&TURNO="+turno+"&HABITACION=" + habitacion +"&ENFERMERA="+enfermera+ "&TIEMPORESPUESTA=" + TiempoRES+"&PACIENTE="
-                +PACIENTE+"&MEDICO="+MEDICO+"&PAGO="+PAGO+"&ESTACION="+ESTACION+"&SECCION="+SECCION+"&AUDIO=AUDIO";
+                +PACIENTE+"&MEDICO="+MEDICO+"&PAGO="+PAGO+"&ESTACION="+ESTACION+"&SECCION="+SECCION+"&AUDIO="+AUDIO;
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
             @Override
