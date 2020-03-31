@@ -54,11 +54,11 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
     SimpleDateFormat horaFormat = new SimpleDateFormat("HH:mm:ss");
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
     Date horaD, horaD1, horaD0, date;
-    String D0, D1, horafinal, turno, fechafinal, AE="", ip="192.168.0.16", DISPOSITIVO = "1";
+    String D0, D1, horafinal, turno, fechafinal, AE="", ip="192.168.0.16", DISPOSITIVO = "5";
     String habitacion = "N/A";
     String TiempoRES = "SIN RESPUESTA";
     String enfermera = "N/A";
-    String PACIENTE="N/A",MEDICO="N/A",PAGO="N/A",ESTACION="N/A",SECCION="N/A",AUDIO="N/A";
+    String PACIENTE="N/A",MEDICO="N/A",PAGO="N/A",ESTACION="N/A",SECCION="N/A",AUDIO="N/A",hs="N/A";
     long numEvento = 1;
     long idEorA, difh, difm, difs = 0;
     private String outputFile = null;
@@ -76,8 +76,6 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
     int bytesCount; // amount of read bytes
     private Thread CICLO;
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");*/
-
-
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
@@ -134,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             habitacion = extras.getString("hb");
+            hs=extras.getString("hs");
             consultageneral();
         }
         Toast.makeText(getApplicationContext(), "HABITACION: "+habitacion, Toast.LENGTH_LONG).show();
@@ -143,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
                 Bundle extras = getIntent().getExtras();
                 if (extras != null) {
                     habitacion = extras.getString("hb");
+                    hs=extras.getString("hs");
                     consultageneral();
                 }
                 AE = "EMERGENCIA";
@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
                 turno();
                 horaD0 = new Date();
                 sendHTTPRequest();
-                fecha.setText("ASISTENCIA\nHABITACION: " + habitacion + "\nPACIENTE=" + PACIENTE + "\nMEDICO=" + MEDICO );
+                fecha.setText("EMERGENCIA\nHABITACION: " + habitacion + "\nPACIENTE=" + PACIENTE + "\nMEDICO=" + MEDICO );
                 numEvento = numEvento + 1;
             }
         });
@@ -175,6 +175,7 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
                         Bundle extras = getIntent().getExtras();
                         if (extras !=null){
                             habitacion = extras.getString("hb");
+                            hs=extras.getString("hs");
                             consultageneral();
                         }
                         AE = "ASISTENCIA";
@@ -515,8 +516,7 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
         MyRequestQueue.add(MyStringRequest);
     }
     public void consultageneral() {
-            String url1 = "http://" + ip + "/BDEJEMPLOS/CONSULTAGENERAL.php?HABITACION="+ habitacion;
-            //String url1 = "http://" + ip + "/BDEJEMPLOS/CONSULTAGENERAL.php?HABITACION=105";
+            String url1 = "http://" + ip + "/BDEJEMPLOS/CONSULTAGENERAL.php?HABITACION="+ habitacion +"&IP="+hs+"&NODISPOSITIVO="+DISPOSITIVO;
             jsonrequest = new JsonObjectRequest(Request.Method.POST, url1, null, this, this);////////////////////////////////////////////////////////////json webservices/////////////////
             request1.add(jsonrequest);
     }
@@ -553,5 +553,4 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
             e.printStackTrace();
         }
     }
-
 }

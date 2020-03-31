@@ -40,7 +40,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class modificardispositivo extends AppCompatActivity implements Response.ErrorListener, Response.Listener<JSONObject> {
+public class modificardispositivo extends AppCompatActivity{
 
     RequestQueue request1;
     JSONArray consulta;
@@ -67,7 +67,7 @@ public class modificardispositivo extends AppCompatActivity implements Response.
             public void onClick(View v) {
                 hs=host.getText().toString();
                 hb=habitacion.getText().toString();
-                actualizardisp();
+                Toast.makeText(getApplicationContext(), "ACTUALIZADO", Toast.LENGTH_LONG).show();
             }
         });
         REGRESAR.setOnClickListener(new View.OnClickListener() {
@@ -75,24 +75,10 @@ public class modificardispositivo extends AppCompatActivity implements Response.
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 intent.putExtra("hb", habitacion.getText().toString());
+                intent.putExtra("hs", host.getText().toString());
                 startActivity(intent);
             }
         });
     }
 
-
-    public void actualizardisp() {
-        String url1 = "http://"+hs+"/BDEJEMPLOS/actualizardisp.php?NODISPOSITIVO=1&HABITACION="+hb+"&IP="+hs;
-        jsonrequest = new JsonObjectRequest(Request.Method.POST, url1, null, this, this);////////////////////////////////////////////////////////////json webservices/////////////////
-        request1.add(jsonrequest);
-    }
-    @Override
-    public void onErrorResponse(VolleyError error) {
-        Toast.makeText(getApplicationContext(), "ERROR EN LA ACTUALIZACION ", Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onResponse(JSONObject response) {
-        Toast.makeText(getApplicationContext(), "ACTUALIZACION LISTA", Toast.LENGTH_LONG).show();
-    }
 }
