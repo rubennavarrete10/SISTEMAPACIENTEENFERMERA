@@ -74,6 +74,7 @@ public class modificardispositivo extends AppCompatActivity implements Response.
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.putExtra("hb", habitacion.getText().toString());
                 startActivity(intent);
             }
         });

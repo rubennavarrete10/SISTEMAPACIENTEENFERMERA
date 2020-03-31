@@ -13,9 +13,13 @@ package SPE.PKG;
         private String PRIMERAPEIDO;
         private String SEGUNDOAPEIDO;
         private String TR;
-        private String ipbd;
-        private String hbbd;
-        private String disbd;
+        private String IP;
+        private String NODISPOSITIVO;
+        private String PACIENTE;
+        private String MEDICO;
+        private String PAGO;
+        private String NOESTACION;
+        private String NOSECCION;
 
     public String getFOLIODISPOSITIVO() { return FOLIODISPOSITIVO; }
     public void setFOLIODISPOSITIVO(String FOLIODISPOSITIVO) { this.FOLIODISPOSITIVO=FOLIODISPOSITIVO; }
@@ -35,18 +39,24 @@ package SPE.PKG;
     public void setPRIMERAPEIDO(String PRIMERAPEIDO) { this.PRIMERAPEIDO=PRIMERAPEIDO; }
     public String getSEGUNDOAPEIDO() { return SEGUNDOAPEIDO; }
     public void setSEGUNDOAPEIDO(String SEGUNDOAPEIDO) { this.SEGUNDOAPEIDO=SEGUNDOAPEIDO; }
-     public void setTR(String TR) { this.TR=TR; }
-     public String getTR() { return TR; }
-     public String getTIPODELLAMDO() { return TIPODELLAMDO; }
-     public void setTIPODELLAMDO(String TIPODELLAMDO) { this.TIPODELLAMDO=TIPODELLAMDO; }
+    public void setTR(String TR) { this.TR=TR; }
+    public String getTR() { return TR; }
+    public String getTIPODELLAMDO() { return TIPODELLAMDO; }
+    public void setTIPODELLAMDO(String TIPODELLAMDO) { this.TIPODELLAMDO=TIPODELLAMDO; }
+    public void setIP(String IP) { this.IP=IP; }
+    public String getIP() { return IP; }
+    public void setNODISPOSITIVO(String NODISPOSITIVO) { this.NODISPOSITIVO=NODISPOSITIVO; }
+    public String getNODISPOSITIVO() { return NODISPOSITIVO; }
+    public void setPACIENTE(String PACIENTE) { this.PACIENTE=PACIENTE; }
+    public String getPACIENTE() { return PACIENTE; }
+    public void setMEDICO(String MEDICO) { this.MEDICO=MEDICO; }
+    public String getMEDICO() { return MEDICO; }
+    public void setPAGO(String PAGO) { this.PAGO=PAGO; }
+    public String getPAGO() { return PAGO; }
+    public void setNOESTACION(String NOESTACION) { this.NOESTACION=NOESTACION; }
+    public String getNOESTACION() { return NOESTACION; }
+    public void setNOSECCION(String NOSECCION) { this.NOSECCION=NOSECCION; }
+    public String getNOSECCION() { return NOSECCION; }
 
-     public void sethbbd(String hbbd) { this.hbbd=hbbd; }
-     public String gethbbd() { return hbbd; }
-
-     public void setIpbd(String ipbd) { this.ipbd=ipbd; }
-     public String getIpbd() { return ipbd; }
-
-     public void setdisbd(String disbd) { this.disbd=disbd; }
-     public String getdisbd() { return disbd; }
 
 }

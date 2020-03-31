@@ -9,9 +9,9 @@
 
     <TextView
         android:id="@+id/textView2"
-        android:layout_width="345dp"
-        android:layout_height="51dp"
-        android:layout_marginStart="40dp"
+        android:layout_width="332dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="192dp"
         android:layout_marginTop="16dp"
         android:contentDescription="@string/app_name"
         android:text="SISTEMA PACIENTE ENFERMERA"
@@ -23,8 +23,8 @@
         android:id="@+id/ASISTENCIA"
         android:layout_width="249dp"
         android:layout_height="55dp"
-        android:layout_marginStart="80dp"
-        android:layout_marginTop="84dp"
+        android:layout_marginStart="52dp"
+        android:layout_marginTop="80dp"
         android:text="ASISTENCIA"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="parent" />
@@ -33,8 +33,8 @@
         android:id="@+id/EMERGENCIA"
         android:layout_width="250dp"
         android:layout_height="56dp"
-        android:layout_marginStart="80dp"
-        android:layout_marginTop="148dp"
+        android:layout_marginStart="380dp"
+        android:layout_marginTop="80dp"
         android:text="EMERGENCIA"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -43,27 +43,27 @@
         android:id="@+id/ASISTENCIAHECHA"
         android:layout_width="173dp"
         android:layout_height="69dp"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="488dp"
+        android:layout_marginStart="320dp"
+        android:layout_marginTop="320dp"
         android:text="ASISTENCIA HECHA"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/fecha"
-        android:layout_width="237dp"
-        android:layout_height="234dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="228dp"
+        android:layout_width="375dp"
+        android:layout_height="116dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="152dp"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/hora"
-        android:layout_width="137dp"
-        android:layout_height="231dp"
-        android:layout_marginStart="256dp"
-        android:layout_marginTop="228dp"
+        android:layout_width="279dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="388dp"
+        android:layout_marginTop="156dp"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -78,10 +78,27 @@
         android:id="@+id/configuracion"
         android:layout_width="138dp"
         android:layout_height="64dp"
-        android:layout_marginStart="244dp"
-        android:layout_marginTop="488dp"
+        android:layout_marginStart="524dp"
+        android:layout_marginTop="320dp"
         android:text="CONFIGURACION"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/Errores"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:layout_editor_absoluteX="651dp"
+        tools:layout_editor_absoluteY="19dp" />
+
+    <Button
+        android:id="@+id/BT"
+        android:layout_width="109dp"
+        android:layout_height="38dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="24dp"
+        android:text="Conectar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
