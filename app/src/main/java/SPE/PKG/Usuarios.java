@@ -1,6 +1,8 @@
 package SPE.PKG;
 
- public class Usuarios  {
+import android.widget.EditText;
+
+public class Usuarios  {
 
         private String TIPODELLAMDO;
         private String FOLIODISPOSITIVO;
@@ -14,6 +16,7 @@ package SPE.PKG;
         private String SEGUNDOAPEIDO;
         private String TR;
         private String IP;
+        private String ESTATUS;
         private String NODISPOSITIVO;
         private String PACIENTE;
         private String MEDICO;
@@ -57,6 +60,8 @@ package SPE.PKG;
     public String getNOESTACION() { return NOESTACION; }
     public void setNOSECCION(String NOSECCION) { this.NOSECCION=NOSECCION; }
     public String getNOSECCION() { return NOSECCION; }
+     public void setESTATUS(String ESTATUS) { this.ESTATUS=ESTATUS; }
+     public String getESTATUS() { return ESTATUS; }
 
 
 }

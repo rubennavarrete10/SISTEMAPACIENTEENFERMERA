@@ -46,19 +46,20 @@ public class modificardispositivo extends AppCompatActivity{
     JSONArray consulta;
     JsonObjectRequest jsonrequest;
 
-    EditText host,habitacion;
-    String hs="192.168.0.16",hb;
+    EditText host,habitacion,dispositivo;
+    String hs,hb,dis;
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.modificardispo);
 
         Button ACTUALIZAR = (Button) findViewById(R.id.ACTUALIZAR);
         Button REGRESAR = (Button) findViewById(R.id.REGRESAR);
         host = (EditText) findViewById(R.id.editText);
         habitacion = (EditText)findViewById(R.id.editText2);
+        dispositivo = (EditText)findViewById(R.id.editText3);
         request1 = Volley.newRequestQueue(this);
 
 
@@ -67,6 +68,8 @@ public class modificardispositivo extends AppCompatActivity{
             public void onClick(View v) {
                 hs=host.getText().toString();
                 hb=habitacion.getText().toString();
+                dis=dispositivo.getText().toString();
+                actualizar();
                 Toast.makeText(getApplicationContext(), "ACTUALIZADO", Toast.LENGTH_LONG).show();
             }
         });
@@ -76,9 +79,28 @@ public class modificardispositivo extends AppCompatActivity{
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 intent.putExtra("hb", habitacion.getText().toString());
                 intent.putExtra("hs", host.getText().toString());
+                intent.putExtra("dis", dispositivo.getText().toString());
                 startActivity(intent);
             }
         });
     }
 
+    private void actualizar() {
+        RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
+        String url1= "http://" + hs + "/BDEJEMPLOS/CONSULTAGENERAL.php?HABITACION="+ hb +"&IP="+hs+"&NODISPOSITIVO="+dis;
+        url1 = url1.replace(" ", "%20");
+        StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Toast.makeText(getApplicationContext(), "ACTUALIZACION EXITOSA", Toast.LENGTH_SHORT).show();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(), "NO SE ACTUALIZO", Toast.LENGTH_SHORT).show();
+            }
+        }) {
+        };
+        MyRequestQueue.add(MyStringRequest);
+    }
 }

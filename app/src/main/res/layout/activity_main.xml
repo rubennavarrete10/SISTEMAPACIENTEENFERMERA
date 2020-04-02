@@ -7,98 +7,103 @@
     tools:context=".MainActivity">
 
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="332dp"
-        android:layout_height="32dp"
-        android:layout_marginStart="192dp"
-        android:layout_marginTop="16dp"
-        android:contentDescription="@string/app_name"
-        android:text="SISTEMA PACIENTE ENFERMERA"
-        android:textSize="18sp"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="parent" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <Button
-        android:id="@+id/ASISTENCIA"
-        android:layout_width="249dp"
-        android:layout_height="55dp"
-        android:layout_marginStart="52dp"
-        android:layout_marginTop="80dp"
-        android:text="ASISTENCIA"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="parent" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/EMERGENCIA"
-        android:layout_width="250dp"
-        android:layout_height="56dp"
-        android:layout_marginStart="380dp"
-        android:layout_marginTop="80dp"
-        android:text="EMERGENCIA"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="10px"
+                android:layout_marginTop="20px"
+                android:layout_marginRight="490px"
+                android:layout_marginBottom="20px"
+                android:contentDescription="@string/app_name"
+                android:text="SISTEMA PACIENTE ENFERMERA"
+                android:textSize="30sp" />
 
-    <Button
-        android:id="@+id/ASISTENCIAHECHA"
-        android:layout_width="173dp"
-        android:layout_height="69dp"
-        android:layout_marginStart="320dp"
-        android:layout_marginTop="320dp"
-        android:text="ASISTENCIA HECHA"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="parent" />
+            <Button
+                android:id="@+id/configuracion"
+                android:layout_width="200px"
+                android:layout_height="150px"
+                android:layout_marginRight="10px"
+                android:text="CONFIGURACION" />
+            <Button
+                android:id="@+id/BT"
+                android:layout_width="200px"
+                android:layout_height="150px"
+                android:layout_marginLeft="10px"
+                android:text="Conectar"
+                android:visibility="visible" />
+        </LinearLayout>
 
-    <TextView
-        android:id="@+id/fecha"
-        android:layout_width="375dp"
-        android:layout_height="116dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="152dp"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="parent" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/hora"
-        android:layout_width="279dp"
-        android:layout_height="64dp"
-        android:layout_marginStart="388dp"
-        android:layout_marginTop="156dp"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/fecha"
+                android:layout_width="800px"
+                android:textSize="50px"
+                android:layout_height="400px" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_begin="-24dp" />
+            <TextView
+                android:id="@+id/hora"
+                android:layout_width="300px"
+                android:textSize="50px"
+                android:layout_height="400px" />
 
-    <Button
-        android:id="@+id/configuracion"
-        android:layout_width="138dp"
-        android:layout_height="64dp"
-        android:layout_marginStart="524dp"
-        android:layout_marginTop="320dp"
-        android:text="CONFIGURACION"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/Errores"
+                android:layout_width="140px"
+                android:textSize="50px"
+                android:layout_height="400px" />
+        </LinearLayout>
 
-    <TextView
-        android:id="@+id/Errores"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:layout_editor_absoluteX="651dp"
-        tools:layout_editor_absoluteY="19dp" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/BT"
-        android:layout_width="109dp"
-        android:layout_height="38dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="24dp"
-        android:text="Conectar"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline" />
+            <Button
+                android:id="@+id/ASISTENCIA"
+                android:layout_width="500px"
+                android:layout_height="250px"
+                android:layout_marginLeft="35px"
+                android:layout_marginRight="850px"
+                android:text="ASISTENCIA" />
 
+            <Button
+                android:id="@+id/EMERGENCIA"
+                android:layout_width="500px"
+                android:layout_height="250px"
+                android:layout_marginRight="35px"
+                android:text="EMERGENCIA" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/ASISTENCIAHECHA"
+                android:layout_width="500px"
+                android:layout_height="200px"
+                android:layout_marginLeft="150px"
+                android:layout_marginRight="150px"
+                android:text="ASISTENCIA HECHA" />
+        </LinearLayout>
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

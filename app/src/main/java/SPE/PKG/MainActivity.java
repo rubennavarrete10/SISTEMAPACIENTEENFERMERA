@@ -50,17 +50,18 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
     RequestQueue request1;
     JSONArray consulta;
     JsonObjectRequest jsonrequest;
-    TextView fecha, hora,error;
+    TextView fecha, hora, error;
     SimpleDateFormat horaFormat = new SimpleDateFormat("HH:mm:ss");
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
     Date horaD, horaD1, horaD0, date;
-    String D0, D1, horafinal, turno, fechafinal, AE="", ip="192.168.0.16", DISPOSITIVO = "5";
-    String habitacion = "N/A";
-    String TiempoRES = "SIN RESPUESTA";
-    String enfermera = "N/A";
-    String PACIENTE="N/A",MEDICO="N/A",PAGO="N/A",ESTACION="N/A",SECCION="N/A",AUDIO="N/A",hs="N/A";
-    long numEvento = 1;
-    long idEorA, difh, difm, difs = 0;
+    Date fechaF0,fechaF1;
+    String F0,F1,D0, D1, horafinal = "N/A", turno = "N/A", fechafinal = "N/A", AE = "N/A", ip = "N/A", DISPOSITIVO = "N/A";
+    String habitacion = "N/A",TiempoRES = "SIN RESPUESTA", enfermera = "N/A", FOLIODIPOSITIVO = "N/A";
+    String PACIENTE = "N/A", MEDICO = "N/A", PAGO = "N/A", ESTACION = "N/A", SECCION = "N/A", AUDIO = "N/A", hs = "N/A";
+    int e=0;
+    long numEvento = 1,folio;
+    long dif=0, difh=0, difm=0, difs = 0;
+
     private String outputFile = null;
     MediaRecorder miGrabacion = null;
     MediaPlayer m = new MediaPlayer();
@@ -129,31 +130,38 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
         });*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            habitacion = extras.getString("hb");
-            hs=extras.getString("hs");
-            consultageneral();
-        }
-        Toast.makeText(getApplicationContext(), "HABITACION: "+habitacion, Toast.LENGTH_LONG).show();
         EMERGENCIA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Bundle extras = getIntent().getExtras();
                 if (extras != null) {
                     habitacion = extras.getString("hb");
-                    hs=extras.getString("hs");
-                    consultageneral();
+                    hs = extras.getString("hs");
+                    DISPOSITIVO = extras.getString("dis");
                 }
-                AE = "EMERGENCIA";
-                idEorA = 1;
-                date = new Date();
-                fechafinal = dateFormat.format(date);
-                turno();
-                horaD0 = new Date();
-                sendHTTPRequest();
-                fecha.setText("EMERGENCIA\nHABITACION: " + habitacion + "\nPACIENTE=" + PACIENTE + "\nMEDICO=" + MEDICO );
-                numEvento = numEvento + 1;
+                habitacion="105";
+                hs="192.168.0.16";
+                DISPOSITIVO="5";
+                e=0;
+                consultageneral();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Do something after 5s = 5000ms
+                        AE = "EMERGENCIA";
+                        //idEorA = 1;
+                        date = new Date();
+                        fechafinal = dateFormat.format(date);
+                        turno();
+                        horaD0 = new Date();
+                        sendHTTPRequest();
+                        fecha.setText("\nHABITACION: " + habitacion + "\nPACIENTE=" + PACIENTE + "\nMEDICO=" + MEDICO);
+                        numEvento = numEvento + 1;
+                        folio=numEvento;
+                        e=0;
+                    }
+                }, 500);
+
             }
         });
         ASISTENCIA.setOnTouchListener(new View.OnTouchListener() {
@@ -173,16 +181,27 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
                     case MotionEvent.ACTION_UP:
                         presionado = false;
                         Bundle extras = getIntent().getExtras();
-                        if (extras !=null){
+                        if (extras != null) {
                             habitacion = extras.getString("hb");
-                            hs=extras.getString("hs");
-                            consultageneral();
+                            hs = extras.getString("hs");
+                            DISPOSITIVO = extras.getString("dis");
                         }
-                        AE = "ASISTENCIA";
-                        sendHTTPRequest();
-                        fecha.setText("ASISTENCIA\nHABITACION: " + habitacion + "\nPACIENTE=" + PACIENTE + "\nMEDICO=" + MEDICO );
-                        numEvento = numEvento + 1;
-                        Toast.makeText(getApplicationContext(), "DEJO DE GRABAR", Toast.LENGTH_LONG).show();
+                        e=0;
+                        consultageneral();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Do something after 5s = 5000ms
+                                AE = "ASISTENCIA";
+                                sendHTTPRequest();
+                                fecha.setText("\nHABITACION: " + habitacion + "\nPACIENTE=" + PACIENTE + "\nMEDICO=" + MEDICO);
+                                numEvento = numEvento + 1;
+                                folio=numEvento;
+                                Toast.makeText(getApplicationContext(), "DEJO DE GRABAR", Toast.LENGTH_LONG).show();
+                                e=0;
+                            }
+                        }, 500);
+
                         break;
                 }
                 return true;
@@ -192,13 +211,32 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
             @Override
             public void onClick(View v) {
                 Bundle extras = getIntent().getExtras();
-                habitacion = extras.getString("hb");
-                TasisEnf();
-                fecha.setText("");
-                updateHTTPRequest();
-                idEorA = 0;
-                TiempoRES = "SIN RESPUESTA";
-                AE="";
+                if (extras != null) {
+                    habitacion = extras.getString("hb");
+                    hs = extras.getString("hs");
+                    DISPOSITIVO = extras.getString("dis");
+                }
+                habitacion="105";
+                hs="192.168.0.16";
+                DISPOSITIVO="5";
+
+                e=1;
+                consultageneral();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Do something after 5s = 5000ms
+                        TasisEnf();
+                        e=0;
+                        consultageneral();
+                        updateHTTPRequest();
+                        //idEorA = 0;
+                        TiempoRES = "SIN RESPUESTA";
+                        numEvento=0;
+                        fechafinal="N/A";
+                        horafinal="N/A";
+                    }
+                }, 500);
             }
         });
         MOD.setOnClickListener(new View.OnClickListener() {
@@ -208,6 +246,7 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
             }
         });
     }
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void reco() {
         outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Fonts/" + habitacion + "Grabacion.mp3";
@@ -235,6 +274,7 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
         }, 200);
 
     }
+
     public void play() {
         if (miGrabacion != null) {
             miGrabacion.stop();
@@ -246,10 +286,7 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
             m.setDataSource(outputFile);
 
 
-
             ////////////////////////////////////////////////////////////////////////////////
-
-
 
 
             /////////////////////////////////////////////////////////////////////////////////////////////
@@ -264,6 +301,7 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
         m.start();
         Toast.makeText(getApplicationContext(), "REPRODUCCION EVENTO", Toast.LENGTH_LONG).show();
     }
+
     public boolean turno() {
         try {
             horaD = new Date();
@@ -296,22 +334,49 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
         }
         return false;
     }
+
     public void TasisEnf() {
-        try {
-            horaD1 = new Date();
-            difs = Math.abs(horaD0.getTime() - horaD1.getTime());
-            difh = difs / (60 * 60 * 1000);
-            difs = difs % (60 * 60 * 1000);
-            difm = difs / (60 * 1000);
-            difs = difs % (60 * 1000);
-            difs = difs / 1000;
-            D0 = String.valueOf(horaD0);
-            D1 = String.valueOf(horaD1);
-            TiempoRES = (String.valueOf(difh) + "HORAS " + String.valueOf(difm) + "MINUTOS " + String.valueOf(difs) + "SEGUNDOS " + String.valueOf(D0) + "   " + String.valueOf(D1) + ".");
-        } catch (Exception e) {
-            alertaTasis();
+        if(e==1){
+            try {
+                date = new Date();
+                F1 =dateFormat.format(date);
+                fechaF1 = dateFormat.parse(F1);
+                fechaF0 = dateFormat.parse(fechafinal);
+                F0 = dateFormat.format(fechaF0);
+                dif = Math.abs(fechaF0.getTime() - fechaF1.getTime());
+                dif=dif/ (60 * 60 * 1000);
+
+                date = new Date();
+                D1 = horaFormat.format(date);
+                horaD1 = horaFormat.parse(D1);
+                horaD0 = horaFormat.parse(horafinal);
+                difs = Math.abs(horaD0.getTime() - horaD1.getTime());
+                difh = difs / (60 * 60 * 1000)+dif;
+                difs = difs % (60 * 60 * 1000);
+                difm = difs / (60 * 1000);
+                difs = difs % (60 * 1000);
+                difs = difs / 1000;
+                TiempoRES = (String.valueOf(difh) + "HORAS " + String.valueOf(difm) + "MINUTOS " + String.valueOf(difs) + "SEGUNDOS.");
+            } catch (Exception e) {
+                alertaTasis();
+            }
+        }
+        if(e==0){
+            try {
+                horaD1 = new Date();
+                difs = Math.abs(horaD0.getTime() - horaD1.getTime());
+                difh = difs / (60 * 60 * 1000);
+                difs = difs % (60 * 60 * 1000);
+                difm = difs / (60 * 1000);
+                difs = difs % (60 * 1000);
+                difs = difs / 1000;
+                TiempoRES = (String.valueOf(difh) + "HORAS " + String.valueOf(difm) + "MINUTOS " + String.valueOf(difs) + "SEGUNDOS.");
+            } catch (Exception e) {
+                alertaTasis();
+            }
         }
     }
+
     public void alertaturno() {
         AlertDialog.Builder noeventos = new AlertDialog.Builder(this);
         noeventos.setTitle("ERROR!");
@@ -337,6 +402,7 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
         });
         handler.postDelayed(runnable, 3000);
     }
+
     public void alertaTasis() {
         AlertDialog.Builder noeventos = new AlertDialog.Builder(this);
         noeventos.setTitle("ERROR!");
@@ -360,8 +426,9 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
                 handler.removeCallbacks(runnable);
             }
         });
-        handler.postDelayed(runnable, 3000);
+        handler.postDelayed(runnable, 2000);
     }
+
     public void alertaRECO() {
         AlertDialog.Builder noeventos = new AlertDialog.Builder(this);
         noeventos.setTitle("ERROR!");
@@ -387,6 +454,7 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
         });
         handler.postDelayed(runnable, 3000);
     }
+
     public void alertaRECO2() {
         AlertDialog.Builder noeventos = new AlertDialog.Builder(this);
         noeventos.setTitle("ERROR!");
@@ -412,6 +480,7 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
         });
         handler.postDelayed(runnable, 3000);
     }
+
     public void alertaPLAY() {
         AlertDialog.Builder noeventos = new AlertDialog.Builder(this);
         noeventos.setTitle("ERROR!");
@@ -437,6 +506,7 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
         });
         handler.postDelayed(runnable, 3000);
     }
+
     public void alertaPLAY2() {
         AlertDialog.Builder noeventos = new AlertDialog.Builder(this);
         noeventos.setTitle("ERROR!");
@@ -462,10 +532,12 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
         });
         handler.postDelayed(runnable, 3000);
     }
+
     public void login() {
         login login = new login();
         login.show(getSupportFragmentManager(), "INICIO SESION");
     }
+
     public void applyTexts(String usuario, String contraseña) {
         if (usuario.equals("USER") == true && contraseña.equals("1234") == true) {
             Toast.makeText(getApplicationContext(), "SESION INICIADA", Toast.LENGTH_SHORT).show();
@@ -475,82 +547,125 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
             Toast.makeText(getApplicationContext(), "USUARIO O CONTRASEÑA INCORRECTA", Toast.LENGTH_SHORT).show();
         }
     }
-    public void sendHTTPRequest() {
 
+    public void sendHTTPRequest() {
+        numEvento=folio;
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
-        String url1 = "http://"+ip+"/BDEJEMPLOS/REGISTROEVENTOS.php?FOLIODISPOSITIVO=" + (numEvento ) + "&TIPODELLAMADO="+AE+"&FECHA=" + fechafinal + "&HORA=" + horafinal+ "&TURNO="+turno+"&HABITACION=" + habitacion +"&ENFERMERA="+enfermera+ "&TIEMPORESPUESTA=" + TiempoRES+"&PACIENTE="
-                +PACIENTE+"&MEDICO="+MEDICO+"&PAGO="+PAGO+"&ESTACION="+ESTACION+"&SECCION="+SECCION+"&AUDIO="+AUDIO;
+        String url1 = "http://" + hs + "/BDEJEMPLOS/REGISTROEVENTOS.php?FOLIODISPOSITIVO=" + (numEvento) + "&TIPODELLAMADO=" + AE + "&FECHA=" + fechafinal + "&HORA=" + horafinal + "&TURNO=" + turno + "&HABITACION=" + habitacion + "&ENFERMERA=" + enfermera + "&TIEMPORESPUESTA=" + TiempoRES + "&PACIENTE="
+                + PACIENTE + "&MEDICO=" + MEDICO + "&PAGO=" + PAGO + "&ESTACION=" + ESTACION + "&SECCION=" + SECCION + "&AUDIO=" + AUDIO;
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Toast.makeText(getApplicationContext(), "REGISTRO EXITOSO", Toast.LENGTH_SHORT).show();
+                fecha.setText("\nHABITACION: " + habitacion + "\nPACIENTE: " + PACIENTE + "\nMEDICO: " + MEDICO);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                hora.setText(error.toString());
                 Toast.makeText(getApplicationContext(), "NO SE REGISTRO", Toast.LENGTH_SHORT).show();
             }
         }) {
         };
         MyRequestQueue.add(MyStringRequest);
     }
+
     public void updateHTTPRequest() {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
-        String url1 = "http://"+ip+"/BDEJEMPLOS/UPDATETIEMPO.php?FOLIODISPOSITIVO=" + (numEvento-1) + "&TIPODELLAMADO="+AE+"&FECHA=" + fechafinal + "&HORA=" + horafinal+"&HABITACION=" + habitacion + "&TIEMPORESPUESTA=" + TiempoRES;
+        String url1 = "http://" + hs + "/BDEJEMPLOS/UPDATETIEMPO.php?FOLIODISPOSITIVO=" + (numEvento - 1) + "&TIPODELLAMADO=" + AE + "&FECHA=" + fechafinal + "&HORA=" + horafinal + "&HABITACION=" + habitacion + "&TIEMPORESPUESTA=" + TiempoRES;
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Toast.makeText(getApplicationContext(), "REGISTRO EXITOSO", Toast.LENGTH_SHORT).show();
+                AE="OCUPADO";
+                fecha.setText("\nHABITACION: " + habitacion + "\nPACIENTE: " + PACIENTE + "\nMEDICO: " + MEDICO);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                hora.setText(error.toString());
                 Toast.makeText(getApplicationContext(), "NO SE REGISTRO", Toast.LENGTH_SHORT).show();
             }
         }) {
         };
         MyRequestQueue.add(MyStringRequest);
     }
+
     public void consultageneral() {
-            String url1 = "http://" + ip + "/BDEJEMPLOS/CONSULTAGENERAL.php?HABITACION="+ habitacion +"&IP="+hs+"&NODISPOSITIVO="+DISPOSITIVO;
-            jsonrequest = new JsonObjectRequest(Request.Method.POST, url1, null, this, this);////////////////////////////////////////////////////////////json webservices/////////////////
-            request1.add(jsonrequest);
+        String url1 = "http://" + hs + "/BDEJEMPLOS/CONSULTAGENERAL.php?HABITACION=" + habitacion + "&IP=" + hs + "&NODISPOSITIVO=" + DISPOSITIVO+"&TIEMPORESPUESTA=" + TiempoRES+"&E="+e;
+        jsonrequest = new JsonObjectRequest(Request.Method.POST, url1, null, this, this);////////////////////////////////////////////////////////////json webservices/////////////////
+        request1.add(jsonrequest);
     }
+
     @Override
     public void onErrorResponse(VolleyError error) {
     }
+
     @Override
     public void onResponse(JSONObject response) {
         consulta = response.optJSONArray("usuario");
-        try {
-            for (int i = 0; i < consulta.length(); i++) {
-                Usuarios consultaUsuario;
-                consultaUsuario = new Usuarios();
-                JSONObject jsonconsulta = null;
-                jsonconsulta = consulta.getJSONObject(i);
-                consultaUsuario.setIP(jsonconsulta.optString("IP"));
-                consultaUsuario.setNODISPOSITIVO(jsonconsulta.optString("NODISPOSITIVO"));
-                consultaUsuario.setHABITACION(jsonconsulta.optString("HABITACION"));
-                consultaUsuario.setPACIENTE(jsonconsulta.optString("PACIENTE"));
-                consultaUsuario.setMEDICO(jsonconsulta.optString("MEDICO"));
-                consultaUsuario.setPAGO(jsonconsulta.optString("PAGO"));
-                consultaUsuario.setNOESTACION(jsonconsulta.optString("NOESTACION"));
-                consultaUsuario.setNOSECCION(jsonconsulta.optString("NOSECCION"));
-                ip = consultaUsuario.getIP();
-                habitacion = consultaUsuario.getHABITACION();
-                DISPOSITIVO = consultaUsuario.getNODISPOSITIVO();
-                PACIENTE = consultaUsuario.getPACIENTE();
-                PAGO = consultaUsuario.getPAGO();
-                MEDICO = consultaUsuario.getMEDICO();
-                ESTACION = consultaUsuario.getNOESTACION();
-                SECCION = consultaUsuario.getNOSECCION();
+        if (e == 0) {
+            try {
+                for (int i = 0; i < consulta.length(); i++) {
+                    Usuarios consultaUsuario;
+                    consultaUsuario = new Usuarios();
+                    JSONObject jsonconsulta = null;
+                    jsonconsulta = consulta.getJSONObject(i);
+                    consultaUsuario.setIP(jsonconsulta.optString("IP"));
+                    consultaUsuario.setESTATUS(jsonconsulta.optString("ESTATUS"));
+                    consultaUsuario.setNODISPOSITIVO(jsonconsulta.optString("NODISPOSITIVO"));
+                    consultaUsuario.setHABITACION(jsonconsulta.optString("NOHABITACION"));
+                    consultaUsuario.setPACIENTE(jsonconsulta.optString("PACIENTE"));
+                    consultaUsuario.setMEDICO(jsonconsulta.optString("MEDICO"));
+                    consultaUsuario.setPAGO(jsonconsulta.optString("PAGO"));
+                    consultaUsuario.setNOESTACION(jsonconsulta.optString("NOESTACION"));
+                    consultaUsuario.setNOSECCION(jsonconsulta.optString("NOSECCION"));
+                    ip = consultaUsuario.getIP();
+                    habitacion = consultaUsuario.getHABITACION();
+                    DISPOSITIVO = consultaUsuario.getNODISPOSITIVO();
+                    PACIENTE = consultaUsuario.getPACIENTE();
+                    PAGO = consultaUsuario.getPAGO();
+                    MEDICO = consultaUsuario.getMEDICO();
+                    ESTACION = consultaUsuario.getNOESTACION();
+                    SECCION = consultaUsuario.getNOSECCION();
+                    AE= consultaUsuario.getESTATUS();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
+            fecha.setText("\nHABITACION: " + habitacion + "\nPACIENTE: " + PACIENTE + "\nMEDICO: " + MEDICO);
+
+    }
+        if (e == 1) {
+            try {
+                for (int i = 0; i < consulta.length(); i++) {
+                    Usuarios consultaUsuario;
+                    consultaUsuario = new Usuarios();
+                    JSONObject jsonconsulta = null;
+                    jsonconsulta = consulta.getJSONObject(i);
+                    consultaUsuario.setTIPODELLAMDO(jsonconsulta.optString("TIPODELLAMADO"));
+                    consultaUsuario.setFECHA(jsonconsulta.optString("FECHA"));
+                    consultaUsuario.setHORA(jsonconsulta.optString("HORA"));
+                    consultaUsuario.setFOLIODISPOSITIVO(jsonconsulta.optString("FOLIODISPOSITIVO"));
+                    AE = consultaUsuario.getTIPODELLAMDO();
+                    fechafinal = consultaUsuario.getFECHA();
+                    horafinal = consultaUsuario.getHORA();
+                    FOLIODIPOSITIVO = consultaUsuario.getFOLIODISPOSITIVO();
+                    numEvento = Integer.parseInt(FOLIODIPOSITIVO);
+                    numEvento=numEvento+1;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
+/*
+handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Do something after 5s = 5000ms
+
+                    }
+                }, 200);
+ */
