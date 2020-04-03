@@ -10,40 +10,49 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#404DC1"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:background="#041747"
             android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/textView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="1300px"
+                android:layout_height="150px"
                 android:layout_gravity="center"
                 android:layout_marginLeft="10px"
                 android:layout_marginTop="20px"
-                android:layout_marginRight="490px"
+                android:layout_marginRight="10px"
                 android:layout_marginBottom="20px"
                 android:contentDescription="@string/app_name"
                 android:text="SISTEMA PACIENTE ENFERMERA"
-                android:textSize="30sp" />
+                android:textColor="@android:color/background_light"
+                android:textSize="40sp" />
 
-            <Button
+            <ImageButton
                 android:id="@+id/configuracion"
                 android:layout_width="200px"
                 android:layout_height="150px"
                 android:layout_marginRight="10px"
-                android:text="CONFIGURACION" />
-            <Button
+                android:background="@null"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/configuracion" />
+
+            <ImageButton
                 android:id="@+id/BT"
                 android:layout_width="200px"
                 android:layout_height="150px"
                 android:layout_marginLeft="10px"
-                android:text="Conectar"
-                android:visibility="visible" />
+                android:background="@null"
+                android:scaleType="fitXY"
+                android:visibility="visible"
+                app:srcCompat="@drawable/bt" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -54,42 +63,24 @@
             <TextView
                 android:id="@+id/fecha"
                 android:layout_width="800px"
-                android:textSize="50px"
-                android:layout_height="400px" />
+                android:layout_height="500px"
+                android:textColor="@android:color/background_light"
+                android:textSize="50px" />
 
             <TextView
                 android:id="@+id/hora"
-                android:layout_width="300px"
-                android:textSize="50px"
-                android:layout_height="400px" />
+                android:layout_width="800px"
+                android:layout_height="500px"
+                android:textColor="@android:color/background_light"
+                android:textSize="50px" />
 
             <TextView
                 android:id="@+id/Errores"
-                android:layout_width="140px"
-                android:textSize="50px"
-                android:layout_height="400px" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/ASISTENCIA"
-                android:layout_width="500px"
-                android:layout_height="250px"
-                android:layout_marginLeft="35px"
-                android:layout_marginRight="850px"
-                android:text="ASISTENCIA" />
-
-            <Button
-                android:id="@+id/EMERGENCIA"
-                android:layout_width="500px"
-                android:layout_height="250px"
-                android:layout_marginRight="35px"
-                android:text="EMERGENCIA" />
+                android:layout_width="320px"
+                android:layout_height="500px"
+                android:textColor="@android:color/background_light"
+                android:layout_marginBottom="20px"
+                android:textSize="50px" />
         </LinearLayout>
 
         <LinearLayout
@@ -97,13 +88,34 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="horizontal">
-            <Button
+
+            <ImageButton
+                android:id="@+id/ASISTENCIA"
+                android:layout_width="500px"
+                android:layout_height="250px"
+                android:layout_marginLeft="35px"
+                android:background="@null"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/asistencia" />
+
+            <ImageButton
                 android:id="@+id/ASISTENCIAHECHA"
                 android:layout_width="500px"
-                android:layout_height="200px"
-                android:layout_marginLeft="150px"
-                android:layout_marginRight="150px"
-                android:text="ASISTENCIA HECHA" />
+                android:layout_height="250px"
+                android:layout_marginLeft="175px"
+                android:layout_marginRight="175px"
+                android:background="@null"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/asistenciahecha" />
+
+            <ImageButton
+                android:id="@+id/EMERGENCIA"
+                android:layout_width="500px"
+                android:layout_height="250px"
+                android:layout_marginRight="35px"
+                android:background="@null"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/emergencia" />
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
@@ -85,10 +86,10 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
 
-        Button ASISTENCIA = (Button) findViewById(R.id.ASISTENCIA);
-        Button ASISTENCIAHECHA = (Button) findViewById(R.id.ASISTENCIAHECHA);
-        Button EMERGENCIA = (Button) findViewById(R.id.EMERGENCIA);
-        Button MOD = (Button) findViewById(R.id.configuracion);
+        ImageButton ASISTENCIA = (ImageButton) findViewById(R.id.ASISTENCIA);
+        ImageButton ASISTENCIAHECHA = (ImageButton) findViewById(R.id.ASISTENCIAHECHA);
+        ImageButton EMERGENCIA = (ImageButton) findViewById(R.id.EMERGENCIA);
+        ImageButton MOD = (ImageButton) findViewById(R.id.configuracion);
         fecha = (TextView) findViewById(R.id.fecha);
         error = (TextView) findViewById(R.id.Errores);
         hora = (TextView) findViewById(R.id.hora);
@@ -155,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
                         turno();
                         horaD0 = new Date();
                         sendHTTPRequest();
-                        fecha.setText("\nHABITACION: " + habitacion + "\nPACIENTE=" + PACIENTE + "\nMEDICO=" + MEDICO);
+                        fecha.setText("\nHABITACION: " + habitacion + "\nPACIENTE: " + PACIENTE + "\nMEDICO: " + MEDICO);
                         numEvento = numEvento + 1;
                         folio=numEvento;
                         e=0;
@@ -180,12 +181,16 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
                         break;
                     case MotionEvent.ACTION_UP:
                         presionado = false;
+
                         Bundle extras = getIntent().getExtras();
                         if (extras != null) {
                             habitacion = extras.getString("hb");
                             hs = extras.getString("hs");
                             DISPOSITIVO = extras.getString("dis");
                         }
+                        habitacion="105";
+                        hs="192.168.0.16";
+                        DISPOSITIVO="5";
                         e=0;
                         consultageneral();
                         handler.postDelayed(new Runnable() {
@@ -194,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
                                 // Do something after 5s = 5000ms
                                 AE = "ASISTENCIA";
                                 sendHTTPRequest();
-                                fecha.setText("\nHABITACION: " + habitacion + "\nPACIENTE=" + PACIENTE + "\nMEDICO=" + MEDICO);
+                                fecha.setText("HABITACION: " + habitacion + "\nPACIENTE: " + PACIENTE + "\nMEDICO: " + MEDICO);
                                 numEvento = numEvento + 1;
                                 folio=numEvento;
                                 Toast.makeText(getApplicationContext(), "DEJO DE GRABAR", Toast.LENGTH_LONG).show();
@@ -558,7 +563,7 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
             @Override
             public void onResponse(String response) {
                 Toast.makeText(getApplicationContext(), "REGISTRO EXITOSO", Toast.LENGTH_SHORT).show();
-                fecha.setText("\nHABITACION: " + habitacion + "\nPACIENTE: " + PACIENTE + "\nMEDICO: " + MEDICO);
+                fecha.setText("HABITACION: " + habitacion + "\nPACIENTE: " + PACIENTE + "\nMEDICO: " + MEDICO);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -578,8 +583,7 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
             @Override
             public void onResponse(String response) {
                 Toast.makeText(getApplicationContext(), "REGISTRO EXITOSO", Toast.LENGTH_SHORT).show();
-                AE="OCUPADO";
-                fecha.setText("\nHABITACION: " + habitacion + "\nPACIENTE: " + PACIENTE + "\nMEDICO: " + MEDICO);
+                fecha.setText("HABITACION: " + habitacion + "\nPACIENTE: " + PACIENTE + "\nMEDICO: " + MEDICO);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -633,7 +637,7 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            fecha.setText("\nHABITACION: " + habitacion + "\nPACIENTE: " + PACIENTE + "\nMEDICO: " + MEDICO);
+            fecha.setText("HABITACION: " + habitacion + "\nPACIENTE: " + PACIENTE + "\nMEDICO: " + MEDICO);
 
     }
         if (e == 1) {
