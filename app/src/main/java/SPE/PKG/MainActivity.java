@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
@@ -68,6 +69,11 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
     MediaPlayer m = new MediaPlayer();
     private boolean presionado = false;
     final Handler handler = new Handler();
+
+    public static final String SHARED_PREFS = "sharedPrefs";
+    public static final String TEXT = "text";
+    public static final String TEXT2 = "text2";
+    public static final String TEXT3 = "text3";
    /* private BluetoothAdapter BTAdapter;
     private ArrayList<BluetoothDevice> btDeviceArray = new ArrayList<BluetoothDevice>();
     private ArrayAdapter<String> mArrayAdapter;
@@ -131,18 +137,22 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
         });*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            habitacion = extras.getString("hb");
+            hs = extras.getString("hs");
+            DISPOSITIVO = extras.getString("dis");
+            saveData();
+        }
+        loadData();
+
+
+        e=0;
+        consultageneral();
+        fecha.setText("\nHABITACION: " + habitacion + "\nPACIENTE: " + PACIENTE + "\nMEDICO: " + MEDICO);
         EMERGENCIA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle extras = getIntent().getExtras();
-                if (extras != null) {
-                    habitacion = extras.getString("hb");
-                    hs = extras.getString("hs");
-                    DISPOSITIVO = extras.getString("dis");
-                }
-                habitacion="105";
-                hs="192.168.0.16";
-                DISPOSITIVO="5";
                 e=0;
                 consultageneral();
                 handler.postDelayed(new Runnable() {
@@ -156,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
                         turno();
                         horaD0 = new Date();
                         sendHTTPRequest();
-                        fecha.setText("\nHABITACION: " + habitacion + "\nPACIENTE: " + PACIENTE + "\nMEDICO: " + MEDICO);
+                        fecha.setText("HABITACION: " + habitacion + "\nPACIENTE: " + PACIENTE + "\nMEDICO: " + MEDICO);
                         numEvento = numEvento + 1;
                         folio=numEvento;
                         e=0;
@@ -181,16 +191,6 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
                         break;
                     case MotionEvent.ACTION_UP:
                         presionado = false;
-
-                        Bundle extras = getIntent().getExtras();
-                        if (extras != null) {
-                            habitacion = extras.getString("hb");
-                            hs = extras.getString("hs");
-                            DISPOSITIVO = extras.getString("dis");
-                        }
-                        habitacion="105";
-                        hs="192.168.0.16";
-                        DISPOSITIVO="5";
                         e=0;
                         consultageneral();
                         handler.postDelayed(new Runnable() {
@@ -215,16 +215,6 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
         ASISTENCIAHECHA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle extras = getIntent().getExtras();
-                if (extras != null) {
-                    habitacion = extras.getString("hb");
-                    hs = extras.getString("hs");
-                    DISPOSITIVO = extras.getString("dis");
-                }
-                habitacion="105";
-                hs="192.168.0.16";
-                DISPOSITIVO="5";
-
                 e=1;
                 consultageneral();
                 handler.postDelayed(new Runnable() {
@@ -662,6 +652,27 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
                 e.printStackTrace();
             }
         }
+    }
+
+    public void saveData(){
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putString(TEXT, habitacion);
+        editor.putString(TEXT2,hs);
+        editor.putString(TEXT3,DISPOSITIVO);
+        editor.apply();
+
+        Toast.makeText(this, "Data saved", Toast.LENGTH_SHORT).show();
+    }
+    public void loadData() {
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        habitacion = sharedPreferences.getString(TEXT,"");
+        hs = sharedPreferences.getString(TEXT2,"");
+        DISPOSITIVO= sharedPreferences.getString(TEXT3,"");
+    }
+    public void updateViews() {
+
     }
 }
 /*
