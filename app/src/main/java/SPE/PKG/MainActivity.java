@@ -1,40 +1,28 @@
 package SPE.PKG;
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
-import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.content.Intent;
-import android.widget.Button;
 import android.widget.TextView;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Set;
-import java.util.UUID;
-
 import androidx.appcompat.app.AppCompatActivity;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -58,32 +46,26 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
     Date horaD, horaD1, horaD0, date;
     Date fechaF0,fechaF1;
     String F0,F1,D0, D1, horafinal = "N/A", turno = "N/A", fechafinal = "N/A", AE = "N/A", ip = "N/A", DISPOSITIVO = "N/A";
-    String habitacion = "N/A",TiempoRES = "SIN RESPUESTA", enfermera = "N/A", FOLIODIPOSITIVO = "N/A";
-    String PACIENTE = "N/A", MEDICO = "N/A", PAGO = "N/A", ESTACION = "N/A", SECCION = "N/A", AUDIO = "N/A", hs = "N/A";
+    String habitacion ="N/A",TiempoRES = "SIN RESPUESTA", enfermera = "N/A", FOLIODIPOSITIVO = "N/A";
+    String PACIENTE ="N/A", MEDICO = "N/A", PAGO = "N/A", ESTACION = "N/A", SECCION = "N/A", AUDIO = "N/A", hs = "N/A";
     int e=0;
     long numEvento = 1,folio;
     long dif=0, difh=0, difm=0, difs = 0;
-
     private String outputFile = null;
     MediaRecorder miGrabacion = null;
     MediaPlayer m = new MediaPlayer();
     private boolean presionado = false;
     final Handler handler = new Handler();
 
+
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String TEXT = "text";
     public static final String TEXT2 = "text2";
     public static final String TEXT3 = "text3";
-   /* private BluetoothAdapter BTAdapter;
-    private ArrayList<BluetoothDevice> btDeviceArray = new ArrayList<BluetoothDevice>();
-    private ArrayAdapter<String> mArrayAdapter;
-    private BluetoothSocket btSocket;
-    private InputStream btin;
-    private OutputStream btout;
-    byte[] buffer = new byte[1024];  // buffer (our data)
-    int bytesCount; // amount of read bytes
-    private Thread CICLO;
-    static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");*/
+    private String text1="0";
+    private String text2="0";
+    private String text3="0";
+
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
@@ -105,51 +87,11 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO}, 1000);
         }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /*Button BTH = (Button) findViewById(R.id.BT);
-        BTAdapter = BluetoothAdapter.getDefaultAdapter();
-
-
-        if(BTAdapter == null){
-            Toast.makeText(getApplicationContext(), "NO SOPORTA BLUETOOTH", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-        if(!BTAdapter.isEnabled()){
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, 1);
-        }
-        else
-        {
-            Toast.makeText(getApplicationContext(), "BLUETOOTH LISTO", Toast.LENGTH_SHORT).show();
-        }
-
-        BTH.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Set<BluetoothDevice> pariedDevices = BTAdapter.getBondedDevices();
-                if(pariedDevices.size() > 0){
-                    for(BluetoothDevice device : pariedDevices){
-                        mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
-                        btDeviceArray.add(device);
-                    }
-                }
-
-            }
-        });*/
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            habitacion = extras.getString("hb");
-            hs = extras.getString("hs");
-            DISPOSITIVO = extras.getString("dis");
-            saveData();
-        }
         loadData();
-
-
         e=0;
         consultageneral();
-        fecha.setText("\nHABITACION: " + habitacion + "\nPACIENTE: " + PACIENTE + "\nMEDICO: " + MEDICO);
+        fecha.setText("HABITACION: " + habitacion + "\nPACIENTE: " + PACIENTE + "\nMEDICO: " + MEDICO);
+
         EMERGENCIA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -225,7 +167,6 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
                         e=0;
                         consultageneral();
                         updateHTTPRequest();
-                        //idEorA = 0;
                         TiempoRES = "SIN RESPUESTA";
                         numEvento=0;
                         fechafinal="N/A";
@@ -652,28 +593,21 @@ public class MainActivity extends AppCompatActivity implements Response.ErrorLis
                 e.printStackTrace();
             }
         }
+        if(habitacion== "null"){
+            habitacion="N/A";
+        }
     }
 
-    public void saveData(){
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putString(TEXT, habitacion);
-        editor.putString(TEXT2,hs);
-        editor.putString(TEXT3,DISPOSITIVO);
-        editor.apply();
-
-        Toast.makeText(this, "Data saved", Toast.LENGTH_SHORT).show();
-    }
     public void loadData() {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        habitacion = sharedPreferences.getString(TEXT,"");
-        hs = sharedPreferences.getString(TEXT2,"");
-        DISPOSITIVO= sharedPreferences.getString(TEXT3,"");
+        text1 = sharedPreferences.getString(TEXT,"N/A");
+        text2= sharedPreferences.getString(TEXT2,"N/A");
+        text3= sharedPreferences.getString(TEXT3,"N/A");
+        habitacion=text1;
+        hs=text2;
+        DISPOSITIVO=text3;
     }
-    public void updateViews() {
 
-    }
 }
 /*
 handler.postDelayed(new Runnable() {

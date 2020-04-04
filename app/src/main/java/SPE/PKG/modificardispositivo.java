@@ -3,6 +3,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
@@ -43,14 +44,17 @@ import org.json.JSONObject;
 public class modificardispositivo extends AppCompatActivity{
 
     RequestQueue request1;
-    JSONArray consulta;
-    JsonObjectRequest jsonrequest;
-
     EditText host,habitacion,dispositivo;
     String hs,hb,dis;
+
+    public static final String SHARED_PREFS = "sharedPrefs";
+    public static final String TEXT = "text";
+    public static final String TEXT2 = "text2";
+    public static final String TEXT3 = "text3";
+
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.modificardispo);
@@ -70,7 +74,7 @@ public class modificardispositivo extends AppCompatActivity{
                 hb=habitacion.getText().toString();
                 dis=dispositivo.getText().toString();
                 actualizar();
-                Toast.makeText(getApplicationContext(), "ACTUALIZADO", Toast.LENGTH_LONG).show();
+                saveData();
             }
         });
         REGRESAR.setOnClickListener(new View.OnClickListener() {
@@ -87,7 +91,7 @@ public class modificardispositivo extends AppCompatActivity{
 
     private void actualizar() {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
-        String url1= "http://" + hs + "/BDEJEMPLOS/CONSULTAGENERAL.php?HABITACION="+ hb +"&IP="+hs+"&NODISPOSITIVO="+dis;
+        String url1= "http://" + hs + "/BDEJEMPLOS/CONSULTAGENERAL.php?HABITACION="+ hb +"&IP="+hs+"&NODISPOSITIVO="+dis+"&TIEMPORESPUESTA=N/A&E=0";
         url1 = url1.replace(" ", "%20");
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url1, new Response.Listener<String>() {
             @Override
@@ -102,5 +106,14 @@ public class modificardispositivo extends AppCompatActivity{
         }) {
         };
         MyRequestQueue.add(MyStringRequest);
+    }
+    public void saveData(){
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(TEXT, hb);
+        editor.putString(TEXT2, hs);
+        editor.putString(TEXT3, dis);
+        editor.apply();
+        Toast.makeText(this, "Data saved", Toast.LENGTH_SHORT).show();
     }
 }
